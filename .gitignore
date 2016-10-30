@@ -1,3 +1,9 @@
+# Build
+build
+
+# Tmp
+tmp*
+
 # Logs
 logs
 *.log

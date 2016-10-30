@@ -1,0 +1,74 @@
+import path from 'path';
+import Muter, {muted} from 'muter';
+import chai, {expect} from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+import GulpGlob from '../src/gulpglob';
+import {invalidArgs, validArgs, validDest, fileList, equalLists,
+  equalFileContents, tmpDir} from './helpers';
+
+chai.use(chaiAsPromised);
+
+describe('GulpGlob is a class encapsulting gulp.src', function() {
+
+  const muter = Muter(console, 'log');
+
+  it(`A GulpGlob instance can't be initialized from an invalid glob argument`,
+    function() {
+      invalidArgs().forEach(arg => {
+        expect(() => new GulpGlob(arg))
+          .to.throw(TypeError, /Invalid glob element:/);
+      });
+  });
+
+  it('A GulpGlob instance has a non-writable member glob', function() {
+    const args = validArgs();
+    args.forEach(arg => {
+      const glb = new GulpGlob(arg);
+      expect(glb.glob).to.eql((Array.isArray(arg) ? arg : [arg]).map(
+        a => path.relative(process.cwd(), a)
+      ));
+      expect(() => {
+        glb.glob = 'package.json';
+      }).to.throw(TypeError, /Cannot set property glob/);
+    });
+  });
+
+  it('A GulpGlob instance can list files', muted(muter, function() {
+    const glb = ['gulp/**/*.js', 'gulpfile.babel.js'];
+    const glob = new GulpGlob(glb);
+    const list = glob.list();
+    const refList = fileList(glb);
+
+    return Promise.all([
+      equalLists(list, refList),
+      list.then(() => {
+        return expect(refList.then(l => l.join('\n') + '\n'))
+          .to.eventually.equal(muter.getLogs());
+      })
+    ]);
+  }));
+
+  it('A GulpGlob instance can copy files', function() {
+    this.timeout(5000);
+    let run = Promise.resolve();
+    [
+      '/tmp/gulpglob-test_' + new Date().getTime(),
+      'tmp'
+    ].forEach(dest => {
+      validArgs().forEach((glb, i) => {
+        const func = dest => {
+          const dest_glb = validDest(dest);
+          const glob = new GulpGlob(glb);
+          const dst = glob.dest(dest);
+
+          expect(dst).to.be.instanceof(GulpGlob);
+          expect(dst.glob).to.eql(dest_glb[i]);
+          return dst.isReady().then(() => equalFileContents(glb, dest));
+        };
+        run = run.then(() => tmpDir(dest + i, func, dest + i));
+      });
+    });
+    return run;
+  });
+
+});
