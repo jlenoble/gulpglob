@@ -5,7 +5,6 @@ import gulp from 'gulp';
 import diff from 'gulp-diff';
 import {noop} from 'gulp-util';
 import {expect} from 'chai';
-import {expectEventuallyDeleted} from 'stat-again';
 
 export function validArgs() {
   return [
@@ -71,22 +70,5 @@ export function equalFileContents(glb, dest, pipe = noop) {
     .pipe(diff.reporter({fail: true}))
     .on('error', reject)
     .on('finish', resolve);
-  });
-};
-
-export function tmpDir(pathname, func, ...args) {
-  return expectEventuallyDeleted(pathname, 30, 10).then(() => {
-    try {
-      let ret = func.apply(this, args);
-      return ret instanceof Promise ? ret : Promise.resolve(ret);
-    } catch (e) {
-      return Promise.reject(e);
-    }
-  }).then(() => {
-    if (!path.relative(process.cwd(), pathname).match(/(\.\.\/)+/)) {
-      return del(pathname);
-    } else {
-      return Promise.resolve();
-    }
   });
 };
