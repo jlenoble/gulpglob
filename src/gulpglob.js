@@ -1,10 +1,13 @@
 import gulp from 'gulp';
 import path from 'path';
 import isValidGlob from 'is-valid-glob';
+import {SingletonFactory} from 'singletons';
 
-export default class GulpGlob {
+const _ready = Symbol();
 
-  constructor(glob, ready = Promise.resolve()) {
+class GulpGlob {
+
+  constructor(glob, options = {ready: Promise.resolve()}) {
     if (!isValidGlob(glob)) {
       throw new TypeError('Invalid glob element: "' + glob + '"');
     }
@@ -14,8 +17,7 @@ export default class GulpGlob {
     const _base = process.cwd();
     const _glob = glob.map(glb => path.relative(_base, glb));
 
-    var _ready = ready;
-    this.isReady = () => _ready;
+    this[_ready] = options.ready;
 
     Object.defineProperties(this, {
       glob: {
@@ -27,12 +29,25 @@ export default class GulpGlob {
     });
   }
 
+  isReady() {
+    return this[_ready];
+  }
+
   src() {
     return gulp.src(this.glob, {base: this.base});
   }
 
+  toPromise() {
+    return this.isReady().then(() => new Promise((resolve, reject) => {
+      this.src()
+        .on('data', () => {})
+        .on('error', reject)
+        .on('end', () => resolve(this));
+    }));
+  }
+
   list() {
-    return this.isReady().then(res => new Promise((resolve, reject) => {
+    return this.isReady().then(() => new Promise((resolve, reject) => {
       var list = [];
       this.src()
         .on('data', file => {
@@ -46,7 +61,7 @@ export default class GulpGlob {
   }
 
   dest(dest) {
-    return new GulpGlob(this.glob.map(glb => {
+    return new GulpGlobSingleton(this.glob.map(glb => {
       var a = glb.split('**');
       a[0] = path.join(dest, a[0]);
 
@@ -55,11 +70,22 @@ export default class GulpGlob {
       } else {
         return path.join(a[0], '**', a[1]);
       }
-    }), new Promise((resolve, reject) => {
-      this.src().pipe(gulp.dest(dest))
-        .on('error', reject)
-        .on('end', resolve);
-    }));
+    }), {
+      ready: new Promise((resolve, reject) => {
+        this.src().pipe(gulp.dest(dest))
+          .on('error', reject)
+          .on('end', resolve);
+      })
+    });
   }
 
 }
+
+const GulpGlobSingleton = SingletonFactory(GulpGlob, [
+  'literal',
+  {
+    property: 'ready'
+  }
+]);
+
+export default GulpGlobSingleton;

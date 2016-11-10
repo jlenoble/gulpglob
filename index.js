@@ -18,13 +18,17 @@ var _isValidGlob = require('is-valid-glob');
 
 var _isValidGlob2 = _interopRequireDefault(_isValidGlob);
 
+var _singletons = require('singletons');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var _ready = Symbol();
+
 var GulpGlob = function () {
   function GulpGlob(glob) {
-    var ready = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Promise.resolve();
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { ready: Promise.resolve() };
 
     _classCallCheck(this, GulpGlob);
 
@@ -41,10 +45,7 @@ var GulpGlob = function () {
       return _path2.default.relative(_base, glb);
     });
 
-    var _ready = ready;
-    this.isReady = function () {
-      return _ready;
-    };
+    this[_ready] = options.ready;
 
     Object.defineProperties(this, {
       glob: {
@@ -61,19 +62,37 @@ var GulpGlob = function () {
   }
 
   _createClass(GulpGlob, [{
+    key: 'isReady',
+    value: function isReady() {
+      return this[_ready];
+    }
+  }, {
     key: 'src',
     value: function src() {
       return _gulp2.default.src(this.glob, { base: this.base });
     }
   }, {
-    key: 'list',
-    value: function list() {
+    key: 'toPromise',
+    value: function toPromise() {
       var _this = this;
 
-      return this.isReady().then(function (res) {
+      return this.isReady().then(function () {
+        return new Promise(function (resolve, reject) {
+          _this.src().on('data', function () {}).on('error', reject).on('end', function () {
+            return resolve(_this);
+          });
+        });
+      });
+    }
+  }, {
+    key: 'list',
+    value: function list() {
+      var _this2 = this;
+
+      return this.isReady().then(function () {
         return new Promise(function (resolve, reject) {
           var list = [];
-          _this.src().on('data', function (file) {
+          _this2.src().on('data', function (file) {
             list.push(file.history[0]);
           }).on('end', function () {
             console.log(list.join('\n'));
@@ -85,9 +104,9 @@ var GulpGlob = function () {
   }, {
     key: 'dest',
     value: function dest(_dest) {
-      var _this2 = this;
+      var _this3 = this;
 
-      return new GulpGlob(this.glob.map(function (glb) {
+      return new GulpGlobSingleton(this.glob.map(function (glb) {
         var a = glb.split('**');
         a[0] = _path2.default.join(_dest, a[0]);
 
@@ -96,14 +115,20 @@ var GulpGlob = function () {
         } else {
           return _path2.default.join(a[0], '**', a[1]);
         }
-      }), new Promise(function (resolve, reject) {
-        _this2.src().pipe(_gulp2.default.dest(_dest)).on('error', reject).on('end', resolve);
-      }));
+      }), {
+        ready: new Promise(function (resolve, reject) {
+          _this3.src().pipe(_gulp2.default.dest(_dest)).on('error', reject).on('end', resolve);
+        })
+      });
     }
   }]);
 
   return GulpGlob;
 }();
 
-exports.default = GulpGlob;
+var GulpGlobSingleton = (0, _singletons.SingletonFactory)(GulpGlob, ['literal', {
+  property: 'ready'
+}]);
+
+exports.default = GulpGlobSingleton;
 module.exports = exports['default'];
