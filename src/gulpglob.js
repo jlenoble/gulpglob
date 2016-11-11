@@ -38,12 +38,7 @@ class GulpGlob {
   }
 
   toPromise() {
-    return this.isReady().then(() => new Promise((resolve, reject) => {
-      this.src()
-        .on('data', () => {})
-        .on('error', reject)
-        .on('end', () => resolve(this));
-    }));
+    return this.isReady().then(() => this);
   }
 
   list() {
