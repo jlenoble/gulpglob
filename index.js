@@ -77,11 +77,7 @@ var GulpGlob = function () {
       var _this = this;
 
       return this.isReady().then(function () {
-        return new Promise(function (resolve, reject) {
-          _this.src().on('data', function () {}).on('error', reject).on('end', function () {
-            return resolve(_this);
-          });
-        });
+        return _this;
       });
     }
   }, {
