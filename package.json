@@ -47,6 +47,6 @@
   "dependencies": {
     "gulp": "git://github.com/gulpjs/gulp.git#4.0",
     "is-valid-glob": "^0.3.0",
-    "singletons": "^0.2.0"
+    "polyton": "^0.3.1"
   }
 }
