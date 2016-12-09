@@ -35,18 +35,22 @@ describe('GulpGlob is a class encapsulting gulp.src', function() {
   });
 
   it('A GulpGlob instance can list files', muted(muter, function() {
-    const glb = ['gulp/**/*.js', 'gulpfile.babel.js'];
-    const glob = new GulpGlob(glb);
-    const list = glob.list();
-    const refList = fileList(glb);
+    return Promise.all(validArgs().map(glb => {
+      const glob = new GulpGlob(glb);
+      const list = glob.list();
+      const refList = fileList(glb);
 
-    return Promise.all([
-      equalLists(list, refList),
-      list.then(() => {
-        return expect(refList.then(l => l.join('\n') + '\n'))
-          .to.eventually.equal(muter.getLogs());
-      })
-    ]);
+      return Promise.all([
+        equalLists(list, refList),
+        list.then(() => {
+          const logs = muter.getLogs().split('\n')
+            .filter(el => el !== '').sort();
+          muter.forget();
+          return expect(refList.then(l => l.sort()))
+            .to.eventually.eql(logs);
+        })
+      ]);
+    }));
   }));
 
   it('A GulpGlob instance can copy files', function() {
