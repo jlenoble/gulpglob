@@ -2,7 +2,7 @@ import path from 'path';
 import Muter, {muted} from 'muter';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import GulpGlob from '../src/simple-gulpglob';
+import SimpleGulpGlob from '../src/simple-gulpglob';
 import {invalidArgs, validArgs, validDest, fileList, equalLists,
   equalFileContents} from './helpers';
 import {tmpDir} from 'cleanup-wrapper';
@@ -16,7 +16,7 @@ describe('SimpleGulpGlob is a class encapsulting gulp.src', function() {
   it(`A SimpleGulpGlob instance can't be initialized from an invalid glob argument`,
     function() {
       invalidArgs().forEach(arg => {
-        expect(() => new GulpGlob(arg))
+        expect(() => new SimpleGulpGlob(arg))
           .to.throw(TypeError, /Invalid glob element:/);
       });
   });
@@ -24,7 +24,7 @@ describe('SimpleGulpGlob is a class encapsulting gulp.src', function() {
   it('A SimpleGulpGlob instance has a non-writable member glob', function() {
     const args = validArgs();
     args.forEach(arg => {
-      const glb = new GulpGlob(arg);
+      const glb = new SimpleGulpGlob(arg);
       expect(glb.glob).to.eql((Array.isArray(arg) ? arg : [arg]).map(
         a => path.relative(process.cwd(), a)
       ));
@@ -36,7 +36,7 @@ describe('SimpleGulpGlob is a class encapsulting gulp.src', function() {
 
   it('A SimpleGulpGlob instance can list files', muted(muter, function() {
     return Promise.all(validArgs().map(glb => {
-      const glob = new GulpGlob(glb);
+      const glob = new SimpleGulpGlob(glb);
       const list = glob.list();
       const refList = fileList(glb);
 
@@ -57,16 +57,16 @@ describe('SimpleGulpGlob is a class encapsulting gulp.src', function() {
     this.timeout(5000);
     let run = Promise.resolve();
     [
-      '/tmp/gulpglob-test_' + new Date().getTime(),
+      '/tmp/SimpleGulpGlob-test_' + new Date().getTime(),
       'tmp'
     ].forEach(dest => {
       validArgs().forEach((glb, i) => {
         const func = function (dest) {
           const dest_glb = validDest(dest);
-          const glob = new GulpGlob(glb);
+          const glob = new SimpleGulpGlob(glb);
           const dst = glob.dest(dest);
 
-          expect(dst).to.be.instanceof(GulpGlob);
+          expect(dst).to.be.instanceof(SimpleGulpGlob);
           expect(dst.glob).to.eql(dest_glb[i]);
           return dst.isReady().then(() => equalFileContents(glb, dest));
         };

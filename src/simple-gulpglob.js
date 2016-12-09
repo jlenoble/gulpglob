@@ -4,7 +4,7 @@ import isValidGlob from 'is-valid-glob';
 
 const _ready = Symbol();
 
-class GulpGlob {
+class SimpleGulpGlob {
 
   constructor(glob, options = {ready: Promise.resolve()}) {
     if (!isValidGlob(glob)) {
@@ -55,7 +55,7 @@ class GulpGlob {
   }
 
   dest(dest) {
-    return new GulpGlob(this.glob.map(glb => {
+    return new SimpleGulpGlob(this.glob.map(glb => {
       var a = glb.split('**');
       a[0] = path.join(dest, a[0]);
 
@@ -75,4 +75,4 @@ class GulpGlob {
 
 }
 
-export default GulpGlob;
+export default SimpleGulpGlob;
