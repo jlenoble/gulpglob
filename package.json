@@ -47,6 +47,7 @@
   "dependencies": {
     "gulp": "git://github.com/gulpjs/gulp.git#4.0",
     "is-valid-glob": "^0.3.0",
-    "polyton": "^0.3.1"
+    "polyton": "^0.3.1",
+    "stream-to-promise": "^2.2.0"
   }
 }
