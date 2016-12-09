@@ -57,7 +57,7 @@ describe('GulpGlob is a class encapsulting gulp.src', function() {
       'tmp'
     ].forEach(dest => {
       validArgs().forEach((glb, i) => {
-        const func = dest => {
+        const func = function (dest) {
           const dest_glb = validDest(dest);
           const glob = new GulpGlob(glb);
           const dst = glob.dest(dest);
@@ -66,7 +66,11 @@ describe('GulpGlob is a class encapsulting gulp.src', function() {
           expect(dst.glob).to.eql(dest_glb[i]);
           return dst.isReady().then(() => equalFileContents(glb, dest));
         };
-        run = run.then(() => tmpDir(dest + i, func, dest + i));
+        run = run.then(tmpDir(dest + i, func.bind(undefined, dest + i)))
+          .catch(err => {
+            expect(err).to.match(
+              /Cannot delete files\/folders outside the current working directory\. Can be overriden with the `force` option/);
+          });
       });
     });
     return run;
