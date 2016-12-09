@@ -5,6 +5,7 @@ import gulp from 'gulp';
 import diff from 'gulp-diff';
 import {noop} from 'gulp-util';
 import {expect} from 'chai';
+import streamToPromise from 'stream-to-promise';
 
 export function validArgs() {
   return [
@@ -13,7 +14,8 @@ export function validArgs() {
     ['package.json'],
     ['gulpfile.babel.js', 'test/**/*.js'],
     ['gulp/**/*.js', 'test/**/*.js'],
-    path.join(process.cwd(), 'package.json')
+    path.join(process.cwd(), 'package.json'),
+    ['gulp/**/*.js', 'src/**/*.js', 'test/**/*.js', '*']
   ];
 };
 
@@ -63,12 +65,8 @@ export function equalLists(list1, list2) {
 };
 
 export function equalFileContents(glb, dest, pipe = noop) {
-  return new Promise((resolve, reject) => {
-    gulp.src(glb, {base: process.cwd()})
+  return streamToPromise(gulp.src(glb, {base: process.cwd()})
     .pipe(pipe())
     .pipe(diff(dest))
-    .pipe(diff.reporter({fail: true}))
-    .on('error', reject)
-    .on('finish', resolve);
-  });
+    .pipe(diff.reporter({fail: true})));
 };
