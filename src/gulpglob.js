@@ -25,6 +25,14 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
       return glob;
     });
   },
+  properties: {
+    glob: {
+      get() {
+        return [[], ...this.map(el => el.glob)].reduce(
+          (array, glb) => array.concat(glb));
+      }
+    }
+  },
   extend: {
     isReady() {
       return Promise.all(this.map(el => el.isReady()));

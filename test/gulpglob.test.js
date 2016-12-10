@@ -66,7 +66,6 @@ describe('GulpGlob is a class encapsulting gulp.src', function() {
           const glob = new GulpGlob(glb);
           const dst = glob.dest(dest);
 
-          expect(dst).to.be.instanceof(GulpGlob);
           expect(dst.glob).to.eql(dest_glb[i]);
           return dst.isReady().then(() => equalFileContents(glb, dest));
         };
