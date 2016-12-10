@@ -8,7 +8,7 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
   'literal',
   'ignore',
 ], undefined, {
-  preprocess: function (args) {
+  preprocess: function(args) {
     return args.map(glob => {
       if (!isValidGlob(glob)) {
         if (isValidGlob(glob[0])) { // Passing glob + options
@@ -42,7 +42,7 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
     },
     list() {
       return Promise.all(this.map(el => {
-        return el.list()
+        return el.list();
       })).then(
         lists => [[], ...lists].reduce((array, list) => array.concat(list)));
     },
