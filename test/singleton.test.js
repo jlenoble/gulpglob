@@ -35,10 +35,23 @@ describe('GulpGlob is singleton class', function() {
     const g2 = g.dest('build2');
     const g3 = g.dest('build1');
 
-    return Promise.all([
-      expect(g1.toPromise()).not.to.eventually.equal(g2),
-      expect(g1.toPromise()).to.eventually.equal(g3)
-    ]);
+    expect(g1).not.to.equal(g2);
+    expect(g1).to.equal(g3);
+    expect(g1.at(0)).not.to.equal(g2.at(0));
+
+    return Promise.all([g1.toPromise(), g2.toPromise()])
+      .then(ggs => {
+        const [_g1, _g2] = ggs;
+        expect(_g1[0]).to.equal(g1.at(0));
+        expect(_g2[0]).to.equal(g2.at(0));
+
+        expect((new GulpGlob('build2/src/**/*.js').at(0).glob)).to.eql(
+          ['build2/src/**/*.js']); // The underlying SimpleGulpGlob has the
+          // correct path
+        expect((new GulpGlob('build2/src/**/*.js')
+          .at(0))).to.equal(g2.at(0)); // The underlying SimpleGulpGlob is
+          // already cached as expected 
+      });
 
   })));
 
