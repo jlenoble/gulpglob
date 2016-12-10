@@ -16,6 +16,7 @@ function join(...args) {
 export const srcDir = 'src';
 export const testDir = 'test';
 export const buildDir = 'build';
+export const distDir = 'lib';
 
 export const apps = ['gulpglob'];
 export const bundleGlob = 'bundle.js';
