@@ -1,5 +1,3 @@
-import gulp from 'gulp';
-import path from 'path';
 import isValidGlob from 'is-valid-glob';
 import SimpleGulpGlob from './simple-gulpglob';
 import {PolytonFactory} from 'polyton';
@@ -8,7 +6,7 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
   'literal',
   'ignore',
 ], undefined, {
-  preprocess: function(args) {
+  preprocess: function (args) {
     return args.map(glob => {
       if (!isValidGlob(glob)) {
         if (isValidGlob(glob[0])) { // Passing glob + options
@@ -27,29 +25,29 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
   },
   properties: {
     glob: {
-      get() {
+      get () {
         return [[], ...this.map(el => el.glob)].reduce(
           (array, glb) => array.concat(glb));
-      }
-    }
+      },
+    },
   },
   extend: {
-    isReady() {
+    isReady () {
       return Promise.all(this.map(el => el.isReady()));
     },
-    toPromise() {
+    toPromise () {
       return Promise.all(this.map(el => el.toPromise()));
     },
-    list() {
+    list () {
       return Promise.all(this.map(el => {
         return el.list();
       })).then(
         lists => [[], ...lists].reduce((array, list) => array.concat(list)));
     },
-    dest(dir) {
+    dest (dir) {
       return new GulpGlob(...this.map(gg => gg._destArgs(dir)));
-    }
-  }
+    },
+  },
 });
 
 export default GulpGlob;

@@ -17,6 +17,7 @@
     "arrow-parens": ["error", "as-needed"],
     "func-names": ["error", "never"],
     "indent": ["error", 2],
+    "new-cap": ["off"],
     "no-param-reassign": ["error", {"props": true}],
     "one-var": ["error", "never"],
     "quotes": ["error", "single", {"allowTemplateLiterals": true}],
