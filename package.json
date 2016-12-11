@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/jlenoble/gulpglob#readme",
   "devDependencies": {
+    "argu": "^0.1.1",
     "autoreload-gulp": "^0.1.0",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-preset-es2015": "^6.9.0",
@@ -32,6 +33,7 @@
     "chai-as-promised": "^6.0.0",
     "cleanup-wrapper": "^0.1.1",
     "del": "^2.2.1",
+    "equal-stream-contents": "^0.1.1",
     "eslint-config-google": "^0.7.1",
     "glob": "^7.1.1",
     "gulp-babel": "^6.1.2",
@@ -42,6 +44,7 @@
     "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-util": "^3.0.7",
+    "merge-stream": "^1.0.1",
     "muter": "^0.5.1",
     "plumb-gulp": "^0.1.0"
   },

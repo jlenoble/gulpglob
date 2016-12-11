@@ -3,9 +3,11 @@ import Muter, {muted} from 'muter';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import GulpGlob from '../src/gulpglob';
-import {invalidArgs, validArgs, validDest, fileList, equalLists,
+import {invalidArgs, validArgs, validDest, fileList, fileSrc, equalLists,
   equalFileContents} from './helpers';
 import {tmpDir} from 'cleanup-wrapper';
+import equalStreamContents from 'equal-stream-contents';
+import {toArrayOfArrays} from 'argu';
 
 chai.use(chaiAsPromised);
 
@@ -32,6 +34,31 @@ describe('GulpGlob is a class encapsulting gulp.src', function() {
         glb.glob = 'package.json';
       }).to.throw(TypeError, /Cannot set property glob/);
     });
+  });
+
+  it('A GulpGlob instance can source files', function() {
+    const p = Promise.all(validArgs().map(glb => {
+      // Pass a valid glob as init arg
+      const glob = new GulpGlob(glb);
+      const src = glob.src();
+      const refSrc = fileSrc(glb);
+
+      expect(glob.length).to.equal(1);
+
+      return equalStreamContents(src, refSrc);
+    }));
+
+    return p.then(() => Promise.all(validArgs().map(glb => {
+      // Pass same valid glob as init arg, but spread in single subglobs
+      const glbs = toArrayOfArrays(glb);
+      const glob = new GulpGlob(...glbs);
+      const src = glob.src();
+      const refSrc = fileSrc(glb);
+
+      expect(glob.length).to.equal(glbs.length);
+
+      return equalStreamContents(src, refSrc);
+    })));
   });
 
   it('A GulpGlob instance can list files', muted(muter, function() {

@@ -1,4 +1,5 @@
 import isValidGlob from 'is-valid-glob';
+import merge from 'merge-stream';
 import SimpleGulpGlob from './simple-gulpglob';
 import {PolytonFactory} from 'polyton';
 
@@ -34,6 +35,9 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
   extend: {
     isReady () {
       return Promise.all(this.map(el => el.isReady()));
+    },
+    src () {
+      return merge(...this.map(el => el.src()));
     },
     toPromise () {
       return Promise.all(this.map(el => el.toPromise()));

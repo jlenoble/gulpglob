@@ -56,6 +56,10 @@ export function fileList(glb) {
   }))).then(files => files.reduce((arr1, arr2) => arr1.concat(arr2)));
 };
 
+export function fileSrc(glb) {
+  return gulp.src(glb);
+}
+
 export function equalLists(list1, list2) {
   return list1.then(l => {
     return expect(list2).to.have.eventually.members(l);
