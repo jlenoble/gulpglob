@@ -1,6 +1,6 @@
 {
   "name": "gulpglob",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "A wrapper around gulp.src to make recycling patterns easier",
   "main": "lib/gulpglob.js",
   "scripts": {
