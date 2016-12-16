@@ -3,11 +3,12 @@ import Muter, {muted} from 'muter';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import GulpGlob from '../src/gulpglob';
-import {invalidArgs, validArgs, validDest, fileList, fileSrc, equalLists,
-  equalFileContents} from './helpers';
+import {invalidArgs, validArgs, validDest, fileList, fileSrc,
+  equalLists} from './helpers';
 import {tmpDir} from 'cleanup-wrapper';
 import equalStreamContents from 'equal-stream-contents';
 import {toArrayOfArrays} from 'argu';
+import equalFileContents from 'equal-file-contents';
 
 chai.use(chaiAsPromised);
 
@@ -94,12 +95,22 @@ describe('GulpGlob is a class encapsulting gulp.src', function() {
           const dst = glob.dest(dest);
 
           expect(dst.glob).to.eql(dest_glb[i]);
-          return dst.isReady().then(() => equalFileContents(glb, dest));
+
+          let _glb = glb;
+          if (Array.isArray(glb)) {
+            _glb = [...glb];
+            _glb.push('!' + dest);
+          }
+          return dst.isReady().then(() => equalFileContents(_glb, dest));
         };
         run = run.then(tmpDir(dest + i, func.bind(undefined, dest + i)))
           .catch(err => {
-            expect(err).to.match(
-              /Cannot delete files\/folders outside the current working directory\. Can be overriden with the `force` option/);
+            try {
+              expect(err).to.match(
+                /Cannot delete files\/folders outside the current working directory\. Can be overriden with the `force` option/);
+            } catch(e) {
+              throw err;
+            }
           });
       });
     });

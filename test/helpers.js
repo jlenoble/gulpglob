@@ -5,7 +5,6 @@ import gulp from 'gulp';
 import diff from 'gulp-diff';
 import {noop} from 'gulp-util';
 import {expect} from 'chai';
-import streamToPromise from 'stream-to-promise';
 
 export function validArgs() {
   return [
@@ -66,11 +65,4 @@ export function equalLists(list1, list2) {
   }).catch((err) => {
     throw new Error(err);
   });
-};
-
-export function equalFileContents(glb, dest, pipe = noop) {
-  return streamToPromise(gulp.src(glb, {base: process.cwd()})
-    .pipe(pipe())
-    .pipe(diff(dest))
-    .pipe(diff.reporter({fail: true})));
 };
