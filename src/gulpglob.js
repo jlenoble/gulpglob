@@ -3,27 +3,29 @@ import merge from 'merge-stream';
 import SimpleGulpGlob from './simple-gulpglob';
 import {PolytonFactory} from 'polyton';
 
+export function preprocess (args) {
+  return args.map(glob => {
+    if (!isValidGlob(glob)) {
+      if (isValidGlob(glob[0])) { // Passing glob + options
+        if (glob[1] && glob[1].ready) {
+          return glob;
+        }
+      }
+      throw new TypeError('Invalid glob element: "' + glob + '"');
+    }
+    if (Array.isArray(glob)) {
+      return [glob]; // Necessary for the array glob to be viewed as a
+      // single argument and not a list of args.
+    }
+    return glob;
+  });
+}
+
 const GulpGlob = PolytonFactory(SimpleGulpGlob, [
   'literal',
   'ignore',
 ], undefined, {
-  preprocess: function (args) {
-    return args.map(glob => {
-      if (!isValidGlob(glob)) {
-        if (isValidGlob(glob[0])) { // Passing glob + options
-          if (glob[1] && glob[1].ready) {
-            return glob;
-          }
-        }
-        throw new TypeError('Invalid glob element: "' + glob + '"');
-      }
-      if (Array.isArray(glob)) {
-        return [glob]; // Necessary for the array glob to be viewed as a
-        // single argument and not a list of args.
-      }
-      return glob;
-    });
-  },
+  preprocess,
   properties: {
     glob: {
       get () {
