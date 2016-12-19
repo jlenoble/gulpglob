@@ -53,6 +53,6 @@
     "equal-file-contents": "^0.1.1",
     "gulp": "git://github.com/gulpjs/gulp.git#4.0",
     "is-valid-glob": "^0.3.0",
-    "polyton": "^0.4.0"
+    "polyton": "^0.4.3"
   }
 }
