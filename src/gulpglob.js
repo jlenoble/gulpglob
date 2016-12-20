@@ -21,11 +21,20 @@ export function preprocess (args) {
   });
 }
 
+function postprocess (instance, args) {
+  args.forEach((arg, i) => {
+    if (arg.length > 1) {
+      instance.at(i)._resetReady(arg[1]);
+    }
+  });
+  return instance;
+}
+
 const GulpGlob = PolytonFactory(SimpleGulpGlob, [
   'literal',
   'ignore',
 ], undefined, {
-  preprocess,
+  preprocess, postprocess,
   properties: {
     glob: {
       get () {

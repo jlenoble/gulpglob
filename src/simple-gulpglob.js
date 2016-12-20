@@ -78,6 +78,13 @@ class SimpleGulpGlob {
     }];
   }
 
+  _resetReady (options) {
+    const {ready} = options;
+    if (ready) {
+      this[_ready] = ready();
+    }
+  }
+
 }
 
 export default SimpleGulpGlob;
