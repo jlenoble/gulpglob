@@ -10,19 +10,18 @@ import equalFileContents from 'equal-file-contents';
 
 chai.use(chaiAsPromised);
 
-describe('SimpleGulpGlob is a class encapsulting gulp.src', function() {
+describe('SimpleGulpGlob is a class encapsulting gulp.src', function () {
+  const muter = Muter(console, 'log'); // eslint-disable-line new-cap
 
-  const muter = Muter(console, 'log');
-
-  it(`A SimpleGulpGlob instance can't be initialized from an invalid glob argument`,
-    function() {
-      invalidArgs().forEach(arg => {
-        expect(() => new SimpleGulpGlob(arg))
-          .to.throw(TypeError, /Invalid glob element:/);
-      });
+  it(`A SimpleGulpGlob instance can't be initialized from an invalid glob` +
+    `argument`, function () {
+    invalidArgs().forEach(arg => {
+      expect(() => new SimpleGulpGlob(arg))
+        .to.throw(TypeError, /Invalid glob element:/);
+    });
   });
 
-  it('A SimpleGulpGlob instance has a non-writable member glob', function() {
+  it('A SimpleGulpGlob instance has a non-writable member glob', function () {
     const args = validArgs();
     args.forEach(arg => {
       const glb = new SimpleGulpGlob(arg);
@@ -35,7 +34,7 @@ describe('SimpleGulpGlob is a class encapsulting gulp.src', function() {
     });
   });
 
-  it('A SimpleGulpGlob instance can list files', muted(muter, function() {
+  it('A SimpleGulpGlob instance can list files', muted(muter, function () {
     return Promise.all(validArgs().map(glb => {
       const glob = new SimpleGulpGlob(glb);
       const list = glob.list();
@@ -49,26 +48,26 @@ describe('SimpleGulpGlob is a class encapsulting gulp.src', function() {
           muter.forget();
           return expect(refList.then(l => l.sort()))
             .to.eventually.eql(logs);
-        })
+        }),
       ]);
     }));
   }));
 
-  it('A SimpleGulpGlob instance can copy files', function() {
-    this.timeout(5000);
+  it('A SimpleGulpGlob instance can copy files', function () {
+    this.timeout(5000); // eslint-disable-line no-invalid-this
     let run = Promise.resolve();
     [
       '/tmp/SimpleGulpGlob-test_' + new Date().getTime(),
-      'tmp'
+      'tmp',
     ].forEach(dest => {
       validArgs().forEach((glb, i) => {
         const func = function (dest) {
-          const dest_glb = validDest(dest);
+          const destGlb = validDest(dest);
           const glob = new SimpleGulpGlob(glb);
           const dst = glob.dest(dest);
 
           expect(dst).to.be.instanceof(SimpleGulpGlob);
-          expect(dst.glob).to.eql(dest_glb[i]);
+          expect(dst.glob).to.eql(destGlb[i]);
 
           let _glb = glb;
           if (Array.isArray(glb)) {
@@ -90,5 +89,4 @@ describe('SimpleGulpGlob is a class encapsulting gulp.src', function() {
     });
     return run;
   });
-
 });

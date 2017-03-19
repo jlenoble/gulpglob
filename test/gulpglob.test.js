@@ -12,19 +12,18 @@ import equalFileContents from 'equal-file-contents';
 
 chai.use(chaiAsPromised);
 
-describe('GulpGlob is a class encapsulting gulp.src', function() {
-
-  const muter = Muter(console, 'log');
+describe('GulpGlob is a class encapsulting gulp.src', function () {
+  const muter = Muter(console, 'log'); // eslint-disable-line new-cap
 
   it(`A GulpGlob instance can't be initialized from an invalid glob argument`,
-    function() {
-      invalidArgs().forEach(arg => {
-        expect(() => new GulpGlob(arg))
-          .to.throw(TypeError, /Invalid glob element:/);
-      });
+  function () {
+    invalidArgs().forEach(arg => {
+      expect(() => new GulpGlob(arg))
+        .to.throw(TypeError, /Invalid glob element:/);
+    });
   });
 
-  it('A GulpGlob instance has a non-writable member glob', function() {
+  it('A GulpGlob instance has a non-writable member glob', function () {
     const args = validArgs();
     args.forEach(arg => {
       const glb = new GulpGlob(arg);
@@ -37,7 +36,7 @@ describe('GulpGlob is a class encapsulting gulp.src', function() {
     });
   });
 
-  it('A GulpGlob instance can source files', function() {
+  it('A GulpGlob instance can source files', function () {
     const p = Promise.all(validArgs().map(glb => {
       // Pass a valid glob as init arg
       const glob = new GulpGlob(glb);
@@ -62,7 +61,7 @@ describe('GulpGlob is a class encapsulting gulp.src', function() {
     })));
   });
 
-  it('A GulpGlob instance can list files', muted(muter, function() {
+  it('A GulpGlob instance can list files', muted(muter, function () {
     return Promise.all(validArgs().map(glb => {
       const glob = new GulpGlob(glb);
       const list = glob.list();
@@ -76,25 +75,25 @@ describe('GulpGlob is a class encapsulting gulp.src', function() {
           muter.forget();
           return expect(refList.then(l => l.sort()))
             .to.eventually.eql(logs);
-        })
+        }),
       ]);
     }));
   }));
 
-  it('A GulpGlob instance can copy files', function() {
-    this.timeout(5000);
+  it('A GulpGlob instance can copy files', function () {
+    this.timeout(5000); // eslint-disable-line no-invalid-this
     let run = Promise.resolve();
     [
       '/tmp/gulpglob-test_' + new Date().getTime(),
-      'tmp'
+      'tmp',
     ].forEach(dest => {
       validArgs().forEach((glb, i) => {
         const func = function (dest) {
-          const dest_glb = validDest(dest);
+          const destGlb = validDest(dest);
           const glob = new GulpGlob(glb);
           const dst = glob.dest(dest);
 
-          expect(dst.glob).to.eql(dest_glb[i]);
+          expect(dst.glob).to.eql(destGlb[i]);
 
           let _glb = glb;
           if (Array.isArray(glb)) {
@@ -116,5 +115,4 @@ describe('GulpGlob is a class encapsulting gulp.src', function() {
     });
     return run;
   });
-
 });

@@ -5,10 +5,8 @@ import {tmpDir} from 'cleanup-wrapper';
 
 chai.use(chaiAsPromised);
 
-describe('GulpGlob is singleton class', function() {
-
-  it(`Instance returned by ctor is a singleton`, function() {
-
+describe('GulpGlob is singleton class', function () {
+  it(`Instance returned by ctor is a singleton`, function () {
     const g1 = new GulpGlob('src/**/*.js');
     const g2 = new GulpGlob('test/**/*.js');
     const g3 = new GulpGlob('src/**/*.js');
@@ -24,12 +22,10 @@ describe('GulpGlob is singleton class', function() {
       expect(gulpGlobs[0]).to.equal(g4.at(0));
       expect(gulpGlobs[0]).not.to.equal(g4.at(1));
     });
-
   });
 
   it(`Instance returned by 'dest' method is a singleton`, tmpDir('build1',
-    tmpDir('build2', function() {
-
+  tmpDir('build2', function () {
     const g = new GulpGlob('src/**/*.js');
     const g1 = g.dest('build1');
     const g2 = g.dest('build2');
@@ -50,9 +46,7 @@ describe('GulpGlob is singleton class', function() {
           // correct path
         expect((new GulpGlob('build2/src/**/*.js')
           .at(0))).to.equal(g2.at(0)); // The underlying SimpleGulpGlob is
-          // already cached as expected 
+          // already cached as expected
       });
-
   })));
-
 });

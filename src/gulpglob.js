@@ -30,7 +30,7 @@ function postprocess (instance, args) {
   return instance;
 }
 
-const GulpGlob = PolytonFactory(SimpleGulpGlob, [
+const GulpGlob = PolytonFactory(SimpleGulpGlob, [ // eslint-disable-line new-cap
   'literal',
   'ignore',
 ], undefined, {
