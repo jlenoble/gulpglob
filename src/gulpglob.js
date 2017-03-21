@@ -7,21 +7,27 @@ export function preprocess (args) {
   // GulpGlob must receive an array of valid SimpleGulpGlob arguments
   // Here args should always be a wrapping array
 
-  return args.map(glob => {
+  let _args = args.map(glob => {
     if (!isValidGlob(glob)) {
-      // Maybe we have SimpleGulpGlob arguments (glob, options)?
+      // Maybe we have SimpleGulpGlob arguments (glob, options)
       if (isValidGlob(glob[0])) {
         if (glob[1] && glob[1].ready) {
           return glob;
         }
       }
 
-      // Maybe we have an array of SimpleGulpGlobs?
+      // Maybe we have an array of SimpleGulpGlobs
       if (Array.isArray(glob) && glob.length === 1) {
         const [glb] = glob;
         if (glb.elements && glb.elements.every(el => el instanceof
           SimpleGulpGlob)) {
-          return [glb.reduce(((array, el) => array.concat(el.glob)), [])];
+          return glb.reduce((array, el) => {
+            // Now merge when possible
+            const [glob1, options1] = array;
+            const glob2 = el.glob;
+            const options2 = {ready: el.isReady};
+            return [glob1.concat(glob2), options1.concat(options2)];
+          }, [[], []]);
           // Outter [] is necessary for the array glob to be viewed as a
           // single argument and not a list of args.
         }
@@ -31,12 +37,34 @@ export function preprocess (args) {
       throw new TypeError('Invalid glob element: "' + glob + '"');
     }
 
+    // Our glob was a valid one
     if (Array.isArray(glob)) {
       return [glob]; // Necessary for the array glob to be viewed as a
       // single argument and not a list of args.
     }
     return glob;
   });
+
+  _args = _args.reduce((array1, array2) => {
+    // Now merge when possible
+    const [glob1, options1] = array1;
+    const [glob2, options2] = array2;
+
+    const options = options2 ? options1.concat(options2) : options1;
+
+    return [glob1.concat(glob2), options];
+  }, [[], []]);
+
+  const [globs, options] = _args;
+
+  return [[
+    globs.sort().reverse(), // Have '!patterns' at the end
+    {
+      ready: () => {
+        return Promise.all(options.map(opts => opts.ready()));
+      },
+    },
+  ]];
 }
 
 function postprocess (instance, args) {
@@ -56,8 +84,13 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [ // eslint-disable-line new-cap
   properties: {
     glob: {
       get () {
-        return [[], ...this.map(el => el.glob)].reduce(
-          (array, glb) => array.concat(glb));
+        return this.map(el => el.glob).reduce(
+          (array, glb) => array.concat(glb), []);
+      },
+    },
+    length: {
+      get () {
+        return this.glob.length;
       },
     },
   },
