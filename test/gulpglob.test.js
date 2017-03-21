@@ -29,7 +29,7 @@ describe('GulpGlob is a class encapsulting gulp.src', function () {
       const glb = new GulpGlob(arg);
       expect(glb.glob).to.eql((Array.isArray(arg) ? arg : [arg]).map(
         a => path.relative(process.cwd(), a)
-      ));
+      ).sort().reverse());
       expect(() => {
         glb.glob = 'package.json';
       }).to.throw(TypeError, /Cannot set property glob/);
@@ -43,7 +43,7 @@ describe('GulpGlob is a class encapsulting gulp.src', function () {
       const src = glob.src();
       const refSrc = fileSrc(glb);
 
-      expect(glob.length).to.equal(1);
+      expect(glob.length).to.equal(Array.isArray(glb) ? glb.length : 1);
 
       return equalStreamContents(src, refSrc);
     }));
@@ -93,7 +93,7 @@ describe('GulpGlob is a class encapsulting gulp.src', function () {
           const glob = new GulpGlob(glb);
           const dst = glob.dest(dest);
 
-          expect(dst.glob).to.eql(destGlb[i]);
+          expect(dst.glob).to.eql(destGlb[i].sort().reverse());
 
           let _glb = glb;
           if (Array.isArray(glb)) {
