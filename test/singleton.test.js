@@ -11,14 +11,16 @@ describe('GulpGlob is singleton class', function () {
     const g2 = new GulpGlob('test/**/*.js');
     const g3 = new GulpGlob('src/**/*.js');
     const g4 = new GulpGlob('src/**/*.js', 'test/**/*.js');
+    const g5 = new GulpGlob(g1);
+
+    expect(g1).to.equal(g3);
+    expect(g1).to.equal(g5);
 
     expect(g1).not.to.equal(g2);
-    expect(g1).to.equal(g3);
     expect(g1).not.to.equal(g4);
 
     return g1.toPromise().then(gulpGlobs => {
       expect(gulpGlobs[0]).not.to.equal(g2.at(0));
-      expect(gulpGlobs[0]).to.equal(g3.at(0));
       expect(gulpGlobs[0]).to.equal(g4.at(0));
       expect(gulpGlobs[0]).not.to.equal(g4.at(1));
     });

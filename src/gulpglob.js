@@ -4,15 +4,33 @@ import SimpleGulpGlob from './simple-gulpglob';
 import {PolytonFactory} from 'polyton';
 
 export function preprocess (args) {
+  // GulpGlob must receive an array of valid SimpleGulpGlob arguments
+  // Here args should always be a wrapping array
+
   return args.map(glob => {
     if (!isValidGlob(glob)) {
-      if (isValidGlob(glob[0])) { // Passing glob + options
+      // Maybe we have SimpleGulpGlob arguments (glob, options)?
+      if (isValidGlob(glob[0])) {
         if (glob[1] && glob[1].ready) {
           return glob;
         }
       }
+
+      // Maybe we have an array of SimpleGulpGlobs?
+      if (Array.isArray(glob) && glob.length === 1) {
+        const [glb] = glob;
+        if (glb.elements && glb.elements.every(el => el instanceof
+          SimpleGulpGlob)) {
+          return [glb.reduce(((array, el) => array.concat(el.glob)), [])];
+          // Outter [] is necessary for the array glob to be viewed as a
+          // single argument and not a list of args.
+        }
+      }
+
+      // Unhandled cases
       throw new TypeError('Invalid glob element: "' + glob + '"');
     }
+
     if (Array.isArray(glob)) {
       return [glob]; // Necessary for the array glob to be viewed as a
       // single argument and not a list of args.
