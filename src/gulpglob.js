@@ -117,3 +117,4 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [ // eslint-disable-line new-cap
 });
 
 export default GulpGlob;
+export {SimpleGulpGlob};
