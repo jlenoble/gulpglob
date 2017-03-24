@@ -2,6 +2,8 @@ import glob from 'glob';
 import path from 'path';
 import gulp from 'gulp';
 import {expect} from 'chai';
+import cleanupWrapper from 'cleanup-wrapper';
+import SimpleGulpGlob from '../src/simple-gulpglob';
 
 export function validArgs () {
   return [
@@ -60,3 +62,12 @@ export function equalLists (list1, list2) {
     throw new Error(err);
   });
 };
+
+export const tmpOptions = func => cleanupWrapper(func, {
+  before () {
+    this.defaultOptions = SimpleGulpGlob.getDefaults();
+  },
+  after () {
+    SimpleGulpGlob.setDefaults(this.defaultOptions);
+  },
+});

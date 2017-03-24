@@ -10,10 +10,13 @@ export function preprocess (args) {
   let _args = args.map(glob => {
     if (!isValidGlob(glob)) {
       // Maybe we have SimpleGulpGlob arguments (glob, options)
-      if (isValidGlob(glob[0])) {
-        if (glob[1] && glob[1].ready) {
-          return glob;
-        }
+      if (isValidGlob(glob[0]) && typeof glob[1] === 'object') {
+        return [
+          glob[0],
+          Object.assign({
+            ready: () => Promise.resolve(),
+          }, glob[1]),
+        ];
       }
 
       // Maybe we have an array of SimpleGulpGlobs
@@ -59,11 +62,11 @@ export function preprocess (args) {
 
   return [[
     globs.sort().reverse(), // Have '!patterns' at the end
-    {
+    Object.assign({}, ...options, {
       ready: () => {
         return Promise.all(options.map(opts => opts.ready()));
       },
-    },
+    }),
   ]];
 }
 
@@ -71,6 +74,7 @@ function postprocess (instance, args) {
   args.forEach((arg, i) => {
     if (arg.length > 1) {
       instance.at(i)._resetReady(arg[1]);
+      instance.at(i)._resetOptions(arg[1]);
     }
   });
   return instance;
@@ -98,8 +102,8 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [ // eslint-disable-line new-cap
     isReady () {
       return Promise.all(this.map(el => el.isReady()));
     },
-    src () {
-      return merge(...this.map(el => el.src()));
+    src (options) {
+      return merge(...this.map(el => el.src(options)));
     },
     toPromise () {
       return Promise.all(this.map(el => el.toPromise()));
@@ -115,6 +119,9 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [ // eslint-disable-line new-cap
     },
   },
 });
+
+GulpGlob.getDefaults = SimpleGulpGlob.getDefaults;
+GulpGlob.setDefaults = SimpleGulpGlob.setDefaults;
 
 export default GulpGlob;
 export {SimpleGulpGlob};

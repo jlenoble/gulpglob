@@ -3,14 +3,19 @@ import path from 'path';
 import isValidGlob from 'is-valid-glob';
 import destglob from 'destglob';
 
+let defaultOptions = {};
+
 const _ready = Symbol();
+const _options = Symbol();
 
 class SimpleGulpGlob {
 
-  constructor (glb, options = {ready: () => Promise.resolve()}) {
+  constructor (glb, options) {
     if (!isValidGlob(glb)) {
-      throw new TypeError('Invalid glob element: "' + glob + '"');
+      throw new TypeError('Invalid glob element: "' + glb + '"');
     }
+
+    const opts = Object.assign({ready: () => Promise.resolve()}, options);
 
     let glob = glb;
     if (!Array.isArray(glob)) {
@@ -20,7 +25,13 @@ class SimpleGulpGlob {
     const _base = process.cwd();
     const _glob = glob.map(glb => path.relative(_base, glb));
 
-    this[_ready] = options.ready();
+    this[_ready] = opts.ready();
+
+    delete opts.base;
+    delete opts.ready;
+
+    this[_options] = Object.keys(opts).length > 0 ? opts :
+      SimpleGulpGlob.getDefaults();
 
     Object.defineProperties(this, {
       glob: {
@@ -40,8 +51,9 @@ class SimpleGulpGlob {
     return this[_ready];
   }
 
-  src () {
-    return gulp.src(this.glob, {base: this.base});
+  src (options) {
+    const opts = Object.assign({base: this.base}, options || this[_options]);
+    return gulp.src(this.glob, opts);
   }
 
   toPromise () {
@@ -85,6 +97,29 @@ class SimpleGulpGlob {
     }
   }
 
+  _resetOptions (options) {
+    const opts = {};
+
+    Object.keys(options).filter(name => name !== 'ready' && name !== 'base')
+      .forEach(name => {
+        opts[name] = options[name];
+      });
+
+    this[_options] = Object.keys(opts).length > 0 ? opts :
+      SimpleGulpGlob.getDefaults();
+  }
+
 }
+
+SimpleGulpGlob.getDefaults = () => {
+  return Object.assign({}, defaultOptions);
+};
+
+SimpleGulpGlob.setDefaults = options => {
+  if (typeof options === 'object') {
+    defaultOptions = options;
+  }
+};
+
 
 export default SimpleGulpGlob;
