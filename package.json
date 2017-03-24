@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "destglob": "^0.1.0",
-    "is-valid-glob": "^0.3.0",
+    "is-valid-glob": "^0.3.0"
   },
   "peerDependencies": {
     "gulp": "git://github.com/gulpjs/gulp.git#4.0",
