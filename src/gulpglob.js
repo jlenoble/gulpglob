@@ -108,7 +108,7 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [ // eslint-disable-line new-cap
       return Promise.all(this.map(el => {
         return el.list();
       })).then(
-        lists => [[], ...lists].reduce((array, list) => array.concat(list)));
+        lists => lists.reduce((array, list) => array.concat(list)), []);
     },
     dest (dir) {
       return new GulpGlob(...this.map(gg => gg._destArgs(dir)));
