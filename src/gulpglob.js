@@ -105,6 +105,9 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [ // eslint-disable-line new-cap
     src (options) {
       return merge(...this.map(el => el.src(options)));
     },
+    newer (dest, options) {
+      return merge(...this.map(el => el.newer(dest, options)));
+    },
     toPromise () {
       return Promise.all(this.map(el => el.toPromise()));
     },

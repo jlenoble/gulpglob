@@ -2,6 +2,7 @@ import gulp from 'gulp';
 import path from 'path';
 import isValidGlob from 'is-valid-glob';
 import destglob from 'destglob';
+import newer from 'gulp-newer';
 
 let defaultOptions = {};
 
@@ -54,6 +55,10 @@ class SimpleGulpGlob {
   src (options) {
     const opts = Object.assign({base: this.base}, options || this[_options]);
     return gulp.src(this.glob, opts);
+  }
+
+  newer (dest, options) {
+    return this.src(options).pipe(newer(dest));
   }
 
   toPromise () {
