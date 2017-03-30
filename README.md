@@ -1,6 +1,6 @@
 # gulpglob
 A wrapper around gulp.src to make recycling patterns easier
-l
+
 ## Usage
 
 ```js
