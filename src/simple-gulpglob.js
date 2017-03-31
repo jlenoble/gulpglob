@@ -126,5 +126,4 @@ SimpleGulpGlob.setDefaults = options => {
   }
 };
 
-
 export default SimpleGulpGlob;
