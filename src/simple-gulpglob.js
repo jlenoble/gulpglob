@@ -23,7 +23,9 @@ class SimpleGulpGlob {
       glob = [glob];
     }
 
-    const _base = process.cwd();
+    const cwd = process.cwd();
+    const _base = opts.base && path.join(cwd, path.relative(cwd, opts.base)) ||
+      cwd;
     const _glob = glob.map(glb => path.relative(_base, glb));
 
     this[_ready] = opts.ready();
