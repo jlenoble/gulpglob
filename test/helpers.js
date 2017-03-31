@@ -26,6 +26,7 @@ export function validDest (_dest) {
 
 export function invalidArgs () {
   return [
+    undefined,
     '',
     [],
     ['gulpfile.babel.js', ''],

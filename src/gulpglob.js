@@ -22,7 +22,7 @@ export function preprocess (args) {
       // Maybe we have an array of SimpleGulpGlobs
       if (Array.isArray(glob) && glob.length === 1) {
         const [glb] = glob;
-        if (glb.elements && glb.elements.every(el => el instanceof
+        if (glb && glb.elements && glb.elements.every(el => el instanceof
           SimpleGulpGlob)) {
           return glb.reduce((array, el) => {
             // Now merge when possible
