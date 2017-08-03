@@ -58,10 +58,10 @@ class SimpleGulpGlob {
 
   list () {
     return this.isReady().then(() => new Promise((resolve, reject) => {
-      let list = [];
+      const list = [];
       this.src()
         .on('data', file => {
-          list.push(file.history[0]);
+          list.push(file.path);
         })
         .on('end', () => {
           console.log(list.join('\n'));
