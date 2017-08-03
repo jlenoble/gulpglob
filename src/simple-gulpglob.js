@@ -42,6 +42,16 @@ class SimpleGulpGlob {
       glob: {
         value: polypath.relative(cwd),
       },
+
+      options: {
+        get () {
+          return {
+            cwd: this.cwd,
+            base: this.base,
+            ready: () => this[_ready],
+          };
+        },
+      },
     });
   }
 
