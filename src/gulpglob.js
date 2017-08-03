@@ -15,21 +15,49 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
       optional: true,
     },
   }, optional: true},
-], undefined, {
+], ['unordered', 'unique'], {
   preprocess: function (args) {
-    return args.map(([glb, options]) => {
+    // First have all args in the form [glb, options], converting
+    // SimpleGulpGlobs and GulpGlobs
+    const args2 = args.map(([glb, options]) => {
       if (!isValidGlob(glb)) {
-        if (!(glb instanceof SimpleGulpGlob)) {
-          throw new TypeError(`Invalid glob element: "${
-            JSON.stringify(glb)
-          }"`);
+        if (glb instanceof SimpleGulpGlob ||
+          glb instanceof GulpGlob.BasePolyton) {
+          return [glb.glob, glb.options];
         }
 
-        return [glb.glob, glb.options];
+        throw new TypeError(`Invalid glob element: "${
+          JSON.stringify(glb)
+        }"`);
       }
 
       return [Array.isArray(glb) ? glb : [glb], options];
     });
+
+    // Now individualize all glob strings and mark them as excluded or not
+    const args3 = [[]];
+    let i;
+    let exclude;
+
+    args2.forEach(([glb, options]) => {
+      glb.forEach(g => {
+        if (exclude === undefined) {
+          exclude = g[0] === '!';
+          i = 0;
+        } else if (exclude !== (g[0] === '!')) {
+          i++;
+          args3.push([]);
+          exclude = !exclude;
+        }
+
+        // Create an intermediate SimpleGulpGlob to handle easily cwd,
+        // base and readiness
+        args3[i].push(new SimpleGulpGlob(exclude ? g.substring(1) : g,
+          Object.assign({exclude}, options)));
+      });
+    });
+
+    return args2;
   },
 
   properties: {
