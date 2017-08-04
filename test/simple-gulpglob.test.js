@@ -3,8 +3,7 @@ import Muter, {muted} from 'muter';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import SimpleGulpGlob from '../src/simple-gulpglob';
-import {invalidArgs, validArgs, validDest, fileList,
-  equalLists} from './helpers';
+import {invalidArgs, validArgs, fileList, equalLists} from './helpers';
 import {tmpDir} from 'cleanup-wrapper';
 import equalFileContents from 'equal-file-contents';
 
@@ -62,12 +61,10 @@ describe('SimpleGulpGlob is a class encapsulting gulp.src', function () {
     ].forEach(dest => {
       validArgs().forEach((glb, i) => {
         const func = function (dest) {
-          const destGlb = validDest(dest);
           const glob = new SimpleGulpGlob(glb);
           const dst = glob.dest(dest);
 
           expect(dst).to.be.instanceof(SimpleGulpGlob);
-          expect(dst.glob).to.eql(destGlb[i].sort());
 
           let _glb = glb;
           if (Array.isArray(glb)) {

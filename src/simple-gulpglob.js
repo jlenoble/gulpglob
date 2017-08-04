@@ -82,7 +82,8 @@ class SimpleGulpGlob {
 
   dest (dest) {
     const polypath = this[_polypath].rebase(this.base, dest);
-    return new SimpleGulpGlob(polypath.paths, {
+
+    return new SimpleGulpGlob(polypath.relative(dest), {
       ready: () => {
         return new Promise((resolve, reject) => {
           this.src().pipe(gulp.dest(dest))
@@ -90,8 +91,24 @@ class SimpleGulpGlob {
             .on('end', resolve);
         });
       },
+      cwd: dest,
+      base: this.base,
+    });
+  }
+
+  concat (sgg) {
+    if (this.base !== sgg.base) {
+      throw new Error(
+        'SimpleGulpGlobs can only be concatenated if sharing base');
+    }
+
+    const polypath = new PolyPath(...this[_polypath].paths,
+      ...sgg[_polypath].paths);
+
+    return new SimpleGulpGlob(polypath.relative(this.cwd), {
       cwd: this.cwd,
-      base: dest,
+      base: this.base,
+      ready: () => Promise.all([this[_ready], sgg[_ready]]),
     });
   }
 }

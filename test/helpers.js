@@ -4,6 +4,7 @@ import gulp from 'gulp';
 import {expect} from 'chai';
 import cleanupWrapper from 'cleanup-wrapper';
 import SimpleGulpGlob from '../src/simple-gulpglob';
+import {equiv} from 'keyfunc';
 
 export function validArgs () {
   return [
@@ -16,13 +17,6 @@ export function validArgs () {
     ['gulp/**/*.js', 'src/**/*.js', 'test/**/*.js', '*'],
   ];
 };
-
-export function validDest (_dest) {
-  const dest = path.relative(process.cwd(), _dest);
-  return validArgs().map(glb => Array.isArray(glb) ?
-    glb.map(g => path.join(dest, path.relative(process.cwd(), g))) :
-    [path.join(dest, path.relative(process.cwd(), glb))]);
-}
 
 export function invalidArgs () {
   return [
@@ -70,5 +64,23 @@ export const tmpOptions = func => cleanupWrapper(func, {
   },
   after () {
     SimpleGulpGlob.setDefaults(this.defaultOptions);
+  },
+});
+
+export const eq = equiv({
+  type: 'option',
+  sub: {
+    glob: 'array:literal',
+    options: {
+      type: 'option',
+      sub: {
+        cwd: {
+          type: 'literal',
+        },
+        base: {
+          type: 'literal',
+        },
+      },
+    },
   },
 });

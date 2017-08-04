@@ -3,8 +3,7 @@ import Muter, {muted} from 'muter';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import GulpGlob from '../src/gulpglob';
-import {invalidArgs, validArgs, validDest, fileList, fileSrc,
-  equalLists} from './helpers';
+import {invalidArgs, validArgs, fileList, fileSrc, equalLists} from './helpers';
 import {tmpDir} from 'cleanup-wrapper';
 import equalStreamContents from 'equal-stream-contents';
 import {toArrayOfArrays} from 'argu';
@@ -89,11 +88,8 @@ describe('GulpGlob is a class encapsulting gulp.src', function () {
     ].forEach(dest => {
       validArgs().forEach((glb, i) => {
         const func = function (dest) {
-          const destGlb = validDest(dest);
           const glob = new GulpGlob([glb]);
           const dst = glob.dest(dest);
-
-          expect(dst.glob).to.eql(destGlb[i].sort());
 
           let _glb = glb;
           if (Array.isArray(glb)) {
