@@ -15,7 +15,7 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
       optional: true,
     },
   }, optional: true},
-], ['unordered', 'unique'], {
+], undefined, {
   preprocess: function (args) {
     // First have all args in the form [glb, options], converting
     // SimpleGulpGlobs and GulpGlobs
@@ -57,7 +57,13 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
       });
     });
 
-    return args2;
+    // Merge all compatible paths into single globs
+    return args3.map(sggs => {
+      const sgg = sggs.reduce((sgg1, sgg2) => {
+        return sgg1.concat(sgg2);
+      });
+      return [sgg.glob, sgg.options];
+    });
   },
 
   properties: {
