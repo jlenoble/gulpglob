@@ -84,6 +84,10 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
       return Promise.all(this.map(el => el.isReady()));
     },
 
+    toPromise () {
+      return Promise.all(this.map(el => el.toPromise()));
+    },
+
     src (options) {
       return gulp.src(this.glob, options);
     },

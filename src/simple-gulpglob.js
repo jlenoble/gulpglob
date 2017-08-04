@@ -59,6 +59,10 @@ class SimpleGulpGlob {
     return this[_ready];
   }
 
+  toPromise () {
+    return this.isReady().then(() => this);
+  }
+
   src (options) {
     return gulp.src(this.glob, Object.assign({
       base: this.base,
