@@ -31,7 +31,8 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
         }"`);
       }
 
-      return [Array.isArray(glb) ? glb : [glb], options];
+      return [Array.isArray(glb) ? glb : [glb], Object.assign(
+        GulpGlob.getDefaults(), options)];
     });
 
     // Now individualize all glob strings and mark them as excluded or not
@@ -58,23 +59,66 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
     });
 
     // Merge all compatible paths into single globs
-    return args3.map(sggs => {
+    const args4 = args3.map(sggs => {
       const sgg = sggs.reduce((sgg1, sgg2) => {
         return sgg1.concat(sgg2);
       });
-      return [sgg.glob, sgg.options];
+      return sgg;
     });
+
+    // Make sure bases are compatible
+    let base;
+    args4.forEach(sgg => {
+      if (!base) {
+        base = sgg.base;
+      } else if (base !== sgg.base) {
+        throw new Error(
+          'SimpleGulpGlobs can only be concatenated if sharing base');
+      }
+    });
+
+    return args4.map(sgg => [sgg.glob, sgg.options]);
   },
 
   properties: {
-    glob: {
+    cwd: {
       get () {
-        return this.reduce((array, el) => array.concat(el.glob), []);
+        return this.at(0).cwd;
       },
     },
+
+    base: {
+      get () {
+        return this.at(0).base;
+      },
+    },
+
+    glob: {
+      get () {
+        const cwd = this.cwd;
+
+        return this.reduce((array, el) => {
+          const glob = el.exclude ? el.relative(cwd).map(glb => '!' + glb) :
+            el.relative(cwd);
+
+          return array.concat(glob);
+        }, []);
+      },
+    },
+
     length: {
       get () {
         return this.glob.length;
+      },
+    },
+
+    options: {
+      get () {
+        return {
+          cwd: this.cwd,
+          base: this.base,
+          // ready: () => this[_ready],
+        };
       },
     },
   },
@@ -89,13 +133,13 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
     },
 
     src (options) {
-      return gulp.src(this.glob, options);
+      return gulp.src(this.glob, options || this.options);
     },
 
-    list () {
+    list (options) {
       return this.isReady().then(() => new Promise((resolve, reject) => {
         const list = [];
-        this.src()
+        this.src(options)
           .on('data', file => {
             list.push(file.path);
           })
@@ -111,6 +155,9 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
     },
   },
 });
+
+GulpGlob.getDefaults = SimpleGulpGlob.getDefaults;
+GulpGlob.setDefaults = SimpleGulpGlob.setDefaults;
 
 export default GulpGlob;
 export {SimpleGulpGlob};

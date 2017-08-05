@@ -2,6 +2,11 @@ import gulp from 'gulp';
 import isValidGlob from 'is-valid-glob';
 import PolyPath from 'polypath';
 
+let defaultOptions = {
+  cwd: process.cwd(),
+  base: process.cwd(),
+};
+
 const _ready = Symbol();
 const _polypath = Symbol();
 
@@ -14,8 +19,9 @@ class SimpleGulpGlob {
     }
 
     const pcwd = process.cwd();
-    const cwd = options && options.cwd || pcwd;
-    const base = options && options.base || pcwd;
+    const cwd = options && options.cwd || SimpleGulpGlob.getDefaults().cwd;
+    const base = options && options.base || SimpleGulpGlob.getDefaults().base;
+    const exclude = options && options.exclude;
 
     this[_ready] = options && typeof options.ready === 'function' &&
       options.ready() || Promise.resolve();
@@ -37,6 +43,14 @@ class SimpleGulpGlob {
 
       base: {
         value: base,
+      },
+
+      exclude: {
+        value: exclude,
+      },
+
+      paths: {
+        value: polypath.paths,
       },
 
       glob: {
@@ -63,6 +77,10 @@ class SimpleGulpGlob {
     return this.isReady().then(() => this);
   }
 
+  relative (base) {
+    return this[_polypath].relative(base);
+  }
+
   src (options) {
     return gulp.src(this.glob, Object.assign({
       base: this.base,
@@ -70,10 +88,10 @@ class SimpleGulpGlob {
     }, options));
   }
 
-  list () {
+  list (options) {
     return this.isReady().then(() => new Promise((resolve, reject) => {
       const list = [];
-      this.src()
+      this.src(options)
         .on('data', file => {
           list.push(file.path);
         })
@@ -106,8 +124,8 @@ class SimpleGulpGlob {
         'SimpleGulpGlobs can only be concatenated if sharing base');
     }
 
-    const polypath = new PolyPath(...this[_polypath].paths,
-      ...sgg[_polypath].paths);
+    const polypath = new PolyPath(...this.paths,
+      ...sgg.paths);
 
     return new SimpleGulpGlob(polypath.relative(this.cwd), {
       cwd: this.cwd,
@@ -116,5 +134,14 @@ class SimpleGulpGlob {
     });
   }
 }
+
+SimpleGulpGlob.getDefaults = () => {
+  return Object.assign({}, defaultOptions);
+};
+
+SimpleGulpGlob.setDefaults = ({cwd, base}) => {
+  defaultOptions.cwd = cwd || process.cwd();
+  defaultOptions.base = base || process.cwd();
+};
 
 export default SimpleGulpGlob;
