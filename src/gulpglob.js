@@ -80,6 +80,15 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
     return args4.map(sgg => [sgg.glob, sgg.options]);
   },
 
+  postprocess (instance, args) {
+    args.forEach((arg, i) => {
+      if (arg.length > 1) {
+        instance.at(i)._resetReady(arg[1]);
+      }
+    });
+    return instance;
+  },
+
   properties: {
     cwd: {
       get () {

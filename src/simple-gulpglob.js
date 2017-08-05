@@ -133,6 +133,13 @@ class SimpleGulpGlob {
       ready: () => Promise.all([this[_ready], sgg[_ready]]),
     });
   }
+
+  _resetReady (options) {
+    const {ready} = options;
+    if (typeof ready === 'function') {
+      this[_ready] = ready();
+    }
+  }
 }
 
 SimpleGulpGlob.getDefaults = () => {
