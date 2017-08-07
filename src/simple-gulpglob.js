@@ -135,7 +135,7 @@ class SimpleGulpGlob {
   _resetReady (options) {
     const {ready} = options;
     if (typeof ready === 'function') {
-      this[_ready] = ready();
+      this[_ready] = this[_ready].then(ready);
     }
   }
 }

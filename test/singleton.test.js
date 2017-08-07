@@ -48,5 +48,7 @@ describe('GulpGlob is singleton class', function () {
 
     expect(g1).not.to.equal(g2);
     expect(g1).to.equal(g3);
+
+    return Promise.all([g1.isReady(), g2.isReady()]);
   }));
 });

@@ -25,42 +25,35 @@
   },
   "homepage": "https://github.com/jlenoble/gulpglob#readme",
   "devDependencies": {
-    "argu": "^0.1.1",
     "autoreload-gulp": "^0.2.1",
+    "babel-core": "^6.25.0",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-preset-es2015": "^6.24.1",
-    "chai": "^4.1.0",
+    "chai": "^4.1.1",
     "chai-as-promised": "^7.1.1",
-    "cleanup-wrapper": "^0.2.1",
+    "cleanup-wrapper": "^0.2.3",
     "del": "^3.0.0",
     "equal-file-contents": "^0.1.5",
     "equal-stream-contents": "^0.1.3",
-    "eslint": "^4.3.0",
+    "eslint": "^4.4.1",
     "eslint-config-google": "^0.9.1",
     "glob": "^7.1.2",
     "gulp": "git://github.com/gulpjs/gulp.git#4.0",
-    "gulp-babel": "^6.1.2",
-    "gulp-diff": "^1.0.0",
+    "gulp-babel": "^7.0.0",
     "gulp-eslint": "^4.0.0",
     "gulp-mocha": "^4.3.1",
-    "gulp-plumber": "^1.1.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-replace": "^0.6.1",
-    "gulp-sourcemaps": "^2.6.0",
-    "gulp-util": "^3.0.7",
+    "keyfunc": "^0.9.3",
     "merge-stream": "^1.0.1",
     "muter": "^0.6.0",
-    "plumb-gulp": "^0.1.0",
-    "polypath": "^0.2.1",
-    "polyton": "^0.5.1"
+    "plumb-gulp": "^0.1.0"
   },
   "dependencies": {
-    "destglob": "^0.1.4",
-    "gulp-newer": "^1.3.0",
-    "is-valid-glob": "^1.0.0"
+    "argu": "^0.1.1",
+    "is-valid-glob": "^1.0.0",
+    "polypath": "^0.3.1",
+    "singletons": "^0.8.0"
   },
   "peerDependencies": {
-    "gulp": "git://github.com/gulpjs/gulp.git#4.0",
-    "polyton": ">=0.4.6"
+    "gulp": "git://github.com/gulpjs/gulp.git#4.0"
   }
 }
