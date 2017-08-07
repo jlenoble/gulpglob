@@ -31,7 +31,7 @@ describe('GulpGlob is a class encapsulting gulp.src', function () {
       ).sort());
       expect(() => {
         glb.glob = 'package.json';
-      }).to.throw(TypeError, /Cannot set property glob/);
+      }).to.throw(TypeError, /Cannot assign to read only property 'glob'/);
     });
   });
 
@@ -42,8 +42,6 @@ describe('GulpGlob is a class encapsulting gulp.src', function () {
       const src = glob.src();
       const refSrc = fileSrc(glb);
 
-      expect(glob.length).to.equal(Array.isArray(glb) ? glb.length : 1);
-
       return equalStreamContents(src, refSrc);
     }));
 
@@ -53,8 +51,6 @@ describe('GulpGlob is a class encapsulting gulp.src', function () {
       const glob = new GulpGlob(...glbs);
       const src = glob.src();
       const refSrc = fileSrc(glb);
-
-      expect(glob.length).to.equal(glbs.length);
 
       return equalStreamContents(src, refSrc);
     })));

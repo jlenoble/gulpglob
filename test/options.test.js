@@ -44,7 +44,7 @@ describe(`Testing options`, function () {
   it(`src() options have priority over global options`, tmpOptions(function () {
     GulpGlob.setDefaults(options);
 
-    const ggSrc = new GulpGlob('src/**/*.js');
+    const ggSrc = new GulpGlob(['src/**/*.js']);
 
     return Promise.all([
       equalStreamContents(ggSrc.src(), gulp.src('src/**/*.js', options)),

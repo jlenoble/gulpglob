@@ -2,7 +2,6 @@ import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import GulpGlob from '../src/gulpglob';
 import {tmpDir} from 'cleanup-wrapper';
-import {eq} from './helpers';
 
 chai.use(chaiAsPromised);
 
@@ -49,20 +48,5 @@ describe('GulpGlob is singleton class', function () {
 
     expect(g1).not.to.equal(g2);
     expect(g1).to.equal(g3);
-    expect(g1.at(0)).not.to.equal(g2.at(0));
-
-    return Promise.all([g1.toPromise(), g2.toPromise()])
-      .then(([_g1, _g2]) => {
-        expect(_g1[0]).to.equal(g1.at(0));
-        expect(_g2[0]).to.equal(g2.at(0));
-
-        expect(eq(new GulpGlob(['src/**/*.js', {cwd: 'build2'}]).at(0), _g2[0]))
-          .to.be.true; // The underlying SimpleGulpGlob has the correct glob and
-        // options
-
-        expect((new GulpGlob(['src/**/*.js', {cwd: 'build2'}])
-          .at(0))).to.equal(g2.at(0)); // The underlying SimpleGulpGlob is
-        //  already cached as expected
-      });
   }));
 });

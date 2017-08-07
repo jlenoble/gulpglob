@@ -1,10 +1,10 @@
 import isValidGlob from 'is-valid-glob';
-import gulp from 'gulp';
 import SimpleGulpGlob from './simple-gulpglob';
-import {PolytonFactory} from 'polyton';
+import {SingletonFactory} from 'singletons';
+import {toArrayOfArrays} from 'argu';
 
-const GulpGlob = PolytonFactory(SimpleGulpGlob, [
-  'set:literal',
+const GulpGlob = SingletonFactory(SimpleGulpGlob, [
+  'array:literal',
   {type: 'option', sub: {
     cwd: {
       type: 'literal',
@@ -15,14 +15,13 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
       optional: true,
     },
   }, optional: true},
-], undefined, {
+], {
   preprocess: function (args) {
     // First have all args in the form [glb, options], converting
     // SimpleGulpGlobs and GulpGlobs
-    const args2 = args.map(([glb, options]) => {
+    const args2 = toArrayOfArrays(args).map(([glb, options]) => {
       if (!isValidGlob(glb)) {
-        if (glb instanceof SimpleGulpGlob ||
-          glb instanceof GulpGlob.BasePolyton) {
+        if (glb instanceof SimpleGulpGlob) {
           return [glb.glob, glb.options];
         }
 
@@ -66,107 +65,37 @@ const GulpGlob = PolytonFactory(SimpleGulpGlob, [
       return sgg;
     });
 
-    // Make sure bases are compatible
+    // Make sure bases and cwds are compatible
     let base;
+    let cwd;
     args4.forEach(sgg => {
       if (!base) {
         base = sgg.base;
+        cwd = sgg.cwd;
       } else if (base !== sgg.base) {
         throw new Error(
           'SimpleGulpGlobs can only be concatenated if sharing base');
+      } else if (cwd !== sgg.cwd) {
+        throw new Error(
+          'SimpleGulpGlobs can only be concatenated if sharing cwd');
       }
     });
 
-    return args4.map(sgg => [sgg.glob, sgg.options]);
+    return [args4.map(sgg => sgg.glob).reduce((g1, g2) => g1.concat(g2)),
+      {base, cwd, ready: () => Promise.all(args4.map(sgg => sgg.isReady()))}];
   },
 
   postprocess (instance, args) {
-    args.forEach((arg, i) => {
-      if (arg.length > 1) {
-        instance.at(i)._resetReady(arg[1]);
-      }
-    });
+    const [, options] = args;
+    instance._resetReady(options);
     return instance;
-  },
-
-  properties: {
-    cwd: {
-      get () {
-        return this.at(0).cwd;
-      },
-    },
-
-    base: {
-      get () {
-        return this.at(0).base;
-      },
-    },
-
-    glob: {
-      get () {
-        const cwd = this.cwd;
-
-        return this.reduce((array, el) => {
-          const glob = el.exclude ? el.relative(cwd).map(glb => '!' + glb) :
-            el.relative(cwd);
-
-          return array.concat(glob);
-        }, []);
-      },
-    },
-
-    length: {
-      get () {
-        return this.glob.length;
-      },
-    },
-
-    options: {
-      get () {
-        return {
-          cwd: this.cwd,
-          base: this.base,
-          // ready: () => this[_ready],
-        };
-      },
-    },
-  },
-
-  extend: {
-    isReady () {
-      return Promise.all(this.map(el => el.isReady()));
-    },
-
-    toPromise () {
-      return Promise.all(this.map(el => el.toPromise()));
-    },
-
-    src (options) {
-      return gulp.src(this.glob, options || this.options);
-    },
-
-    list (options) {
-      return this.isReady().then(() => new Promise((resolve, reject) => {
-        const list = [];
-        this.src(options)
-          .on('data', file => {
-            list.push(file.path);
-          })
-          .on('end', () => {
-            console.log(list.join('\n'));
-            resolve(list);
-          });
-      }));
-    },
-
-    dest (dir) {
-      return new GulpGlob(...this.map(el => el.dest(dir)));
-    },
   },
 });
 
 GulpGlob.getDefaults = SimpleGulpGlob.getDefaults;
 GulpGlob.setDefaults = SimpleGulpGlob.setDefaults;
+
+SimpleGulpGlob.Singleton = GulpGlob;
 
 export default GulpGlob;
 export {SimpleGulpGlob};

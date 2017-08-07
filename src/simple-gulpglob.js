@@ -1,5 +1,6 @@
 import gulp from 'gulp';
 import isValidGlob from 'is-valid-glob';
+import path from 'path';
 import PolyPath from 'polypath';
 
 let defaultOptions = {
@@ -18,7 +19,6 @@ class SimpleGulpGlob {
       }"`);
     }
 
-    const pcwd = process.cwd();
     const cwd = options && options.cwd || SimpleGulpGlob.getDefaults().cwd;
     const base = options && options.base || SimpleGulpGlob.getDefaults().base;
     const exclude = options && options.exclude;
@@ -27,12 +27,10 @@ class SimpleGulpGlob {
       options.ready() || Promise.resolve();
 
     // Create or recover polyton polypath from glb
-    let polypath = new PolyPath(...(Array.isArray(glb) ? glb : [glb]));
-
-    // If options alter cwd, create or recover altered polyton
-    if (cwd !== pcwd) {
-      polypath = polypath.rebase(cwd);
-    }
+    const _glb = Array.isArray(glb) ? glb : [glb];
+    let polypath = new PolyPath(..._glb.map(g => {
+      return path.isAbsolute(g) ? g : path.join(cwd, g);
+    }));
 
     this[_polypath] = polypath;
 
@@ -105,7 +103,7 @@ class SimpleGulpGlob {
   dest (dest) {
     const polypath = this[_polypath].rebase(this.base, dest);
 
-    return new SimpleGulpGlob(polypath.relative(dest), {
+    return new SimpleGulpGlob.Singleton([polypath.relative(dest), {
       ready: () => {
         return new Promise((resolve, reject) => {
           this.src().pipe(gulp.dest(dest))
@@ -115,7 +113,7 @@ class SimpleGulpGlob {
       },
       cwd: dest,
       base: this.base,
-    });
+    }]);
   }
 
   concat (sgg) {
