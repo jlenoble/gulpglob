@@ -110,6 +110,28 @@ describe(`Testing with various args`, function () {
             'src/**/*.js'))),
         ]));
       });
+
+      const ggSrc2 = new GulpGlob(args);
+      const ggDest2 = ggSrc2.dest(dest);
+
+      it(`Comparing GulpGlob with gulp.src(${JSON.stringify(
+        ggDest2.paths)})`, function () {
+        return ggDest2.isReady().then(() => Promise.all([
+          equalStreamContents(ggDest2.src(), gulp.src(ggDest2.paths)),
+          equalStreamContents(ggDest2.src(), gulp.src(path.join(dest,
+            'src/**/*.js'))),
+        ]));
+      });
     });
+  });
+
+  it(`With option {base: 'src'}`, function () {
+    const ggSrc = new GulpGlob(['src/*.js', {base: 'src'}], [
+      ['src/gulpglob.js', 'src/simple-gulpglob.js'], {base: 'src'}]);
+    const dest = newTestDir('various');
+    const ggDest = ggSrc.dest(dest);
+
+    return ggDest.isReady().then(() => equalStreamContents(ggDest.src(),
+      gulp.src(path.join(dest, '*.js'))));
   });
 });
