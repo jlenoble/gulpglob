@@ -3,7 +3,8 @@ import Muter, {muted} from 'muter';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import GulpGlob from '../src/gulpglob';
-import {invalidArgs, validArgs, fileList, fileSrc, equalLists} from './helpers';
+import {invalidArgs, validArgs, fileList, fileSrc, equalLists,
+  newTestDir} from './helpers';
 import {tmpDir} from 'cleanup-wrapper';
 import equalStreamContents from 'equal-stream-contents';
 import {toArrayOfArrays} from 'argu';
@@ -79,7 +80,7 @@ describe('GulpGlob is a class encapsulting gulp.src', function () {
     this.timeout(5000); // eslint-disable-line no-invalid-this
     let run = Promise.resolve();
     [
-      '/tmp/gulpglob-test_' + new Date().getTime(),
+      newTestDir('gulpglob'),
       'tmp',
     ].forEach(dest => {
       validArgs().forEach((glb, i) => {

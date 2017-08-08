@@ -84,3 +84,10 @@ export const eq = equiv({
     },
   },
 });
+
+let index = 0;
+export const newTestDir = stem => {
+  index++;
+  return `/tmp/${stem ? stem + '-' : ''}test_${new Date().getTime()}_${index}`;
+};
+

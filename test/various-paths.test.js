@@ -3,6 +3,7 @@ import equalStreamContents from 'equal-stream-contents';
 import gulp from 'gulp';
 import path from 'path';
 import {expect} from 'chai';
+import {newTestDir} from './helpers';
 
 describe(`Testing with various args`, function () {
   const cwd = process.cwd();
@@ -92,6 +93,23 @@ describe(`Testing with various args`, function () {
       expect(gg1).to.equal(gg2);
       expect(gg2.glob).to.eql(['*.js']);
       expect(gg2.cwd).to.eql(path.join(cwd, 'src'));
+    });
+  });
+
+  describe(`Pattern '/tmp/dir/src/**/*.js'`, function () {
+    srcArgs.forEach(args => {
+      const ggSrc = new SimpleGulpGlob(...args);
+      const dest = newTestDir('various');
+      const ggDest = ggSrc.dest(dest);
+
+      it(`Comparing SimpleGulpGlob with gulp.src(${JSON.stringify(
+        ggDest.paths)})`, function () {
+        return ggDest.isReady().then(() => Promise.all([
+          equalStreamContents(ggDest.src(), gulp.src(ggDest.paths)),
+          equalStreamContents(ggDest.src(), gulp.src(path.join(dest,
+            'src/**/*.js'))),
+        ]));
+      });
     });
   });
 });

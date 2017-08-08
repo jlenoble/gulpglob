@@ -1,16 +1,10 @@
 import SimpleGulpGlob from '../src/simple-gulpglob';
-import {eq} from './helpers';
+import {eq, newTestDir} from './helpers';
 import {expect} from 'chai';
 import merge from 'merge-stream';
 import equalStreamContents from 'equal-stream-contents';
 
 describe('SimpleGulpGlob has a method concat', function () {
-  let index = 0;
-  const newTestDir = () => {
-    index++;
-    return `/tmp/concat-test_${new Date().getTime()}_${index}`;
-  };
-
   it(`Concatenating with self`, function () {
     const g1 = new SimpleGulpGlob('src/**/*.js');
     expect(eq(g1.concat(g1), g1)).to.be.true;
@@ -37,22 +31,22 @@ describe('SimpleGulpGlob has a method concat', function () {
     expect(eq(g5.concat(g6), g9)).to.be.true;
     expect(eq(g6.concat(g5), g9)).to.be.true;
 
-    const dir1 = newTestDir();
-    const dir2 = newTestDir();
+    const dir1 = newTestDir('concat');
+    const dir2 = newTestDir('concat');
 
     const h1 = g1.dest(dir1);
     const h2 = g2.dest(dir1);
     const h7 = g7.dest(dir2);
 
-    const dir3 = newTestDir();
-    const dir4 = newTestDir();
+    const dir3 = newTestDir('concat');
+    const dir4 = newTestDir('concat');
 
     const h3 = g3.dest(dir3);
     const h4 = g4.dest(dir3);
     const h8 = g8.dest(dir4);
 
-    const dir5 = newTestDir();
-    const dir6 = newTestDir();
+    const dir5 = newTestDir('concat');
+    const dir6 = newTestDir('concat');
 
     const h5 = g5.dest(dir5);
     const h6 = g6.dest(dir5);
