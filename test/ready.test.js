@@ -8,7 +8,7 @@ describe(`Testing 'readiness' of GulpGlobs`, function () {
 
   it(`Resetting 'ready' after calling dest()`, tmpDir(dest, function () {
     const ggSrc = new GulpGlob(['src/**/*.js']);
-    const ggDest = new GulpGlob([`src/**/*.js`, {cwd: dest}]);
+    const ggDest = new GulpGlob([`src/**/*.js`, {cwd: dest, base: dest}]);
 
     const gg = ggSrc.dest(dest); // ggDest singleton already defined with
     // a resolved promise option; must be overridden or equalFileContents

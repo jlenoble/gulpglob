@@ -1,4 +1,5 @@
 import gulp from 'gulp';
+import newer from 'gulp-newer';
 import isValidGlob from 'is-valid-glob';
 import path from 'path';
 import PolyPath from 'polypath';
@@ -86,6 +87,10 @@ class SimpleGulpGlob {
     }, options));
   }
 
+  newer (dest, options) {
+    return this.src(options).pipe(newer(dest));
+  }
+
   list (options) {
     return this.isReady().then(() => new Promise((resolve, reject) => {
       const list = [];
@@ -101,6 +106,7 @@ class SimpleGulpGlob {
   }
 
   dest (dest) {
+    const base = path.relative(this.cwd, this.base);
     const polypath = this[_polypath].rebase(this.base, dest);
 
     return new SimpleGulpGlob.Singleton([polypath.relative(dest), {
@@ -112,7 +118,7 @@ class SimpleGulpGlob {
         });
       },
       cwd: dest,
-      base: this.base,
+      base: path.join(dest, base),
     }]);
   }
 
