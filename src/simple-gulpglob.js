@@ -29,7 +29,7 @@ class SimpleGulpGlob {
 
     // Create or recover polyton polypath from glb
     const _glb = Array.isArray(glb) ? glb : [glb];
-    let polypath = new PolyPath(..._glb.map(g => {
+    const polypath = new PolyPath(..._glb.map(g => {
       return path.isAbsolute(g) ? g : path.join(cwd, g);
     }));
 
@@ -105,18 +105,18 @@ class SimpleGulpGlob {
     }));
   }
 
-  dest (dest) {
+  dest (dest, {ready} = {}) {
     const base = path.relative(this.cwd, this.base);
     const polypath = this[_polypath].rebase(this.base, dest);
 
     return new SimpleGulpGlob.Singleton([polypath.relative(dest), {
-      ready: () => {
+      ready: ready || (() => {
         return new Promise((resolve, reject) => {
           this.src().pipe(gulp.dest(dest))
             .on('error', reject)
             .on('end', resolve);
         });
-      },
+      }),
       cwd: dest,
       base: path.join(dest, base),
     }]);
