@@ -2,7 +2,7 @@ import path from 'path';
 import Muter, {muted} from 'muter';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import SimpleGulpGlob from '../src/simple-gulpglob';
+import {SimpleGulpGlob} from '../src/gulpglob';
 import {invalidArgs, validArgs, fileList, equalLists,
   newTestDir} from './helpers';
 import {tmpDir} from 'cleanup-wrapper';
