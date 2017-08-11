@@ -97,25 +97,25 @@ export const checkPath = dir => {
   const home = os.homedir();
   const tmp = '/tmp';
 
-  const regexp1 = new RegExp(`(${home}|${tmp}).*`);
+  const regexp1 = new RegExp(`(${home}|${tmp})/.*$`);
 
   if (!regexp1.test(dir)) {
     throw new Error(`${dir} is a bad directory path`);
   }
 
-  const regexp2 = new RegExp(`${tmp}/(src|test|gulp).*`);
+  const regexp2 = new RegExp(`${tmp}/(src|test|gulp)(/.*|)$`);
 
   if (regexp2.test(dir)) {
     throw new Error(`${dir} is a bad directory path`);
   }
 
-  const regexp3 = new RegExp(`.*(src|test|gulp)/(src|test|gulp).*`);
+  const regexp3 = new RegExp(`.*(src|test|gulp)/(src|test|gulp)(/.*|)$`);
 
   if (regexp3.test(dir)) {
     throw new Error(`${dir} is a bad directory path`);
   }
 
-  const regexp4 = new RegExp(`.*build/build.*`);
+  const regexp4 = new RegExp(`.*build/build(/.*|)$`);
 
   if (regexp4.test(dir)) {
     throw new Error(`${dir} is a bad directory path`);

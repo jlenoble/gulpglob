@@ -1,4 +1,5 @@
 import isValidGlob from 'is-valid-glob';
+import path from 'path';
 import SimpleGulpGlob from './simple-gulpglob';
 import {SingletonFactory} from 'singletons';
 import {toArrayOfArrays} from 'argu';
@@ -30,8 +31,18 @@ const GulpGlob = SingletonFactory(SimpleGulpGlob, [
         }"`);
       }
 
-      return [Array.isArray(glb) ? glb : [glb], Object.assign(
-        GulpGlob.getDefaults(), options)];
+      let cwd = options && options.cwd || SimpleGulpGlob.getDefaults().cwd;
+      if (!path.isAbsolute(cwd)) {
+        cwd = path.join(process.cwd(), cwd);
+      }
+
+      let base = options && options.base || cwd;
+      if (!path.isAbsolute(base)) {
+        base = path.join(cwd, base);
+      }
+
+      return [Array.isArray(glb) ? glb : [glb], Object.assign({}, options,
+        {cwd, base})];
     });
 
     // Now individualize all glob strings and mark them as excluded or not
