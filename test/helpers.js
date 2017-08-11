@@ -5,6 +5,7 @@ import {expect} from 'chai';
 import cleanupWrapper from 'cleanup-wrapper';
 import SimpleGulpGlob from '../src/simple-gulpglob';
 import {equiv} from 'keyfunc';
+import os from 'os';
 
 export function validArgs () {
   return [
@@ -91,3 +92,32 @@ export const newTestDir = stem => {
   return `/tmp/${stem ? stem + '-' : ''}test_${new Date().getTime()}_${index}`;
 };
 
+export const checkPath = dir => {
+  // Make sure we don't write outside process.cwd() or /tmp/customDir
+  const home = os.homedir();
+  const tmp = '/tmp';
+
+  const regexp1 = new RegExp(`(${home}|${tmp}).*`);
+
+  if (!regexp1.test(dir)) {
+    throw new Error(`${dir} is a bad directory path`);
+  }
+
+  const regexp2 = new RegExp(`${tmp}/(src|test|gulp).*`);
+
+  if (regexp2.test(dir)) {
+    throw new Error(`${dir} is a bad directory path`);
+  }
+
+  const regexp3 = new RegExp(`.*(src|test|gulp)/(src|test|gulp).*`);
+
+  if (regexp3.test(dir)) {
+    throw new Error(`${dir} is a bad directory path`);
+  }
+
+  const regexp4 = new RegExp(`.*build/build.*`);
+
+  if (regexp4.test(dir)) {
+    throw new Error(`${dir} is a bad directory path`);
+  }
+};

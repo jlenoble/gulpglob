@@ -20,8 +20,16 @@ class SimpleGulpGlob {
       }"`);
     }
 
-    const cwd = options && options.cwd || SimpleGulpGlob.getDefaults().cwd;
-    const base = options && options.base || SimpleGulpGlob.getDefaults().base;
+    let cwd = options && options.cwd || SimpleGulpGlob.getDefaults().cwd;
+    if (!path.isAbsolute(cwd)) {
+      cwd = path.join(process.cwd(), cwd);
+    }
+
+    let base = options && options.base || cwd;
+    if (!path.isAbsolute(base)) {
+      base = path.join(cwd, base);
+    }
+
     const exclude = options && options.exclude;
 
     this[_ready] = options && typeof options.ready === 'function' &&
@@ -123,6 +131,11 @@ class SimpleGulpGlob {
   }
 
   concat (sgg) {
+    if (this.cwd !== sgg.cwd) {
+      throw new Error(
+        'SimpleGulpGlobs can only be concatenated if sharing working dir');
+    }
+
     if (this.base !== sgg.base) {
       throw new Error(
         'SimpleGulpGlobs can only be concatenated if sharing base');
