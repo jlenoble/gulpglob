@@ -102,7 +102,7 @@ class SimpleGulpGlob {
   list (options) {
     return this.isReady().then(() => new Promise((resolve, reject) => {
       const list = [];
-      this.src(options)
+      this.src(Object.assign({read: false}, options))
         .on('data', file => {
           list.push(file.path);
         })
