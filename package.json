@@ -28,7 +28,7 @@
     "autoreload-gulp": "^0.3.0",
     "babel-core": "^6.26.0",
     "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "cleanup-wrapper": "^0.3.0",
@@ -43,6 +43,7 @@
     "gulp-eslint": "^4.0.0",
     "gulp-mocha": "^4.3.1",
     "gulp-replace": "^0.6.1",
+    "keyfunc": "^0.10.0",
     "merge-stream": "^1.0.1",
     "muter": "^0.6.0",
     "plumb-gulp": "^0.1.0"
