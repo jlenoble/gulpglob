@@ -45,13 +45,13 @@ const GulpGlob = SingletonFactory(SimpleGulpGlob, [
         {cwd, base})];
     });
 
-    // Now individualize all glob strings and mark them as excluded or not
+    // Now split globs into excluded or not
     const args3 = [[]];
     let i;
     let exclude;
 
     args2.forEach(([glb, options]) => {
-      glb.forEach(g => {
+      glb.forEach((g, nth) => {
         if (exclude === undefined) {
           exclude = g[0] === '!';
           i = 0;
@@ -64,7 +64,11 @@ const GulpGlob = SingletonFactory(SimpleGulpGlob, [
         // Create an intermediate SimpleGulpGlob to handle easily cwd,
         // base and readiness
         args3[i].push(new SimpleGulpGlob(exclude ? g.substring(1) : g,
-          Object.assign({exclude}, options)));
+          Object.assign({exclude}, options, {
+            // Don't run more than once the same ready function on
+            // sibling globs
+            ready: nth === 0 ? options.ready : () => Promise.resolve(),
+          })));
       });
     });
 
