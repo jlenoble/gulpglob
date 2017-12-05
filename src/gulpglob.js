@@ -38,7 +38,7 @@ const GulpGlob = SingletonFactory(SimpleGulpGlob, [
 
       let base = options && options.base || cwd;
       if (!path.isAbsolute(base)) {
-        base = path.join(cwd, base);
+        base = path.join(process.cwd(), base);
       }
 
       return [Array.isArray(glb) ? glb : [glb], Object.assign({}, options,

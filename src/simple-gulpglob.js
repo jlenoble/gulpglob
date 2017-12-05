@@ -27,7 +27,7 @@ class SimpleGulpGlob {
 
     let base = options && options.base || cwd;
     if (!path.isAbsolute(base)) {
-      base = path.join(cwd, base);
+      base = path.join(process.cwd(), base);
     }
 
     const exclude = options && options.exclude;
