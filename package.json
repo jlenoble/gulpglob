@@ -40,6 +40,7 @@
     "glob": "^7.1.2",
     "gulp": "git://github.com/gulpjs/gulp.git#4.0",
     "gulp-babel": "^7.0.0",
+    "gulp-debug": "^3.1.0",
     "gulp-eslint": "^4.0.0",
     "gulp-mocha": "^4.3.1",
     "gulp-replace": "^0.6.1",
