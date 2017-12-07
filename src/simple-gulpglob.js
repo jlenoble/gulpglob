@@ -88,6 +88,10 @@ class SimpleGulpGlob {
     return this[_polypath].relative(base);
   }
 
+  resolve () {
+    return this[_polypath].resolve();
+  }
+
   src (options) {
     return gulp.src(this.glob, Object.assign({
       base: this.base,
