@@ -8,21 +8,16 @@ let defaultOptions = {
   base: process.cwd(),
 };
 
-export const getOptions = options => {
-  let cwd = options && options.cwd || SimpleGulpGlob.getDefaults().cwd;
-  if (!path.isAbsolute(cwd)) {
-    cwd = path.join(process.cwd(), cwd);
+export const getOptions = (options = {}) => {
+  let {cwd, base, ready, exclude} = options;
+
+  cwd = cwd && new Path(cwd).path || defaultOptions.cwd;
+  base = base && new Path(base).path || cwd;
+  exclude = !!exclude;
+
+  if (typeof ready !== 'function') {
+    ready = () => Promise.resolve();
   }
-
-  let base = options && options.base || cwd;
-  if (!path.isAbsolute(base)) {
-    base = path.join(process.cwd(), base);
-  }
-
-  const exclude = options && !!options.exclude;
-
-  const ready = options && typeof options.ready === 'function' &&
-    options.ready || (() => Promise.resolve());
 
   return {cwd, base, ready, exclude};
 };
