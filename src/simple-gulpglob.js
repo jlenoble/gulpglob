@@ -9,6 +9,25 @@ let defaultOptions = {
   base: process.cwd(),
 };
 
+export const getOptions = options => {
+  let cwd = options && options.cwd || SimpleGulpGlob.getDefaults().cwd;
+  if (!path.isAbsolute(cwd)) {
+    cwd = path.join(process.cwd(), cwd);
+  }
+
+  let base = options && options.base || cwd;
+  if (!path.isAbsolute(base)) {
+    base = path.join(process.cwd(), base);
+  }
+
+  const exclude = options && !!options.exclude;
+
+  const ready = options && typeof options.ready === 'function' &&
+    options.ready || (() => Promise.resolve());
+
+  return {cwd, base, ready, exclude};
+};
+
 const _ready = Symbol();
 const _polypath = Symbol();
 
@@ -20,20 +39,9 @@ class SimpleGulpGlob {
       }"`);
     }
 
-    let cwd = options && options.cwd || SimpleGulpGlob.getDefaults().cwd;
-    if (!path.isAbsolute(cwd)) {
-      cwd = path.join(process.cwd(), cwd);
-    }
+    const {base, cwd, ready, exclude} = getOptions(options);
 
-    let base = options && options.base || cwd;
-    if (!path.isAbsolute(base)) {
-      base = path.join(process.cwd(), base);
-    }
-
-    const exclude = options && options.exclude;
-
-    this[_ready] = options && typeof options.ready === 'function' &&
-      options.ready() || Promise.resolve();
+    this[_ready] = ready();
 
     // Create or recover polyton polypath from glb
     const _glb = Array.isArray(glb) ? glb : [glb];
@@ -69,6 +77,7 @@ class SimpleGulpGlob {
           return {
             cwd: this.cwd,
             base: this.base,
+            exclude: this.exclude,
             ready: () => this[_ready],
           };
         },

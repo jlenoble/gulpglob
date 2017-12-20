@@ -1,5 +1,5 @@
 import isValidGlob from 'is-valid-glob';
-import SimpleGulpGlob from './simple-gulpglob';
+import SimpleGulpGlob, {getOptions} from './simple-gulpglob';
 import {SingletonFactory} from 'singletons';
 
 const GulpGlob = SingletonFactory(SimpleGulpGlob, [
@@ -18,14 +18,14 @@ const GulpGlob = SingletonFactory(SimpleGulpGlob, [
   customArgs: [
     [String, {
       convert (glb) {
-        return [[glb], SimpleGulpGlob.getDefaults()];
+        return [[glb], getOptions()];
       },
     }],
     [Array, {
       convert ([glb, options]) {
         return [
           Array.isArray(glb) ? glb : [glb],
-          options || SimpleGulpGlob.getDefaults(),
+          getOptions(options),
         ];
       },
     }],
