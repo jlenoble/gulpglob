@@ -2,7 +2,7 @@ import gulp from 'gulp';
 import newer from 'gulp-newer';
 import isValidGlob from 'is-valid-glob';
 import path from 'path';
-import PolyPath from 'polypath';
+import PolyPath, {Path} from 'polypath';
 
 let defaultOptions = {
   cwd: process.cwd(),
@@ -168,8 +168,8 @@ SimpleGulpGlob.getDefaults = () => {
 };
 
 SimpleGulpGlob.setDefaults = ({cwd, base}) => {
-  defaultOptions.cwd = cwd || process.cwd();
-  defaultOptions.base = base || process.cwd();
+  cwd && (defaultOptions.cwd = new Path(cwd).path);
+  base && (defaultOptions.base = new Path(base).path);
 };
 
 export default SimpleGulpGlob;
