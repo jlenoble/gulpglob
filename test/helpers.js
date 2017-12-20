@@ -1,7 +1,5 @@
-import glob from 'glob';
 import path from 'path';
 import gulp from 'gulp';
-import {expect} from 'chai';
 import cleanupWrapper from 'cleanup-wrapper';
 import SimpleGulpGlob from '../src/simple-gulpglob';
 import {equiv} from 'keyfunc';
@@ -30,34 +28,9 @@ export function invalidArgs () {
   ];
 };
 
-export function fileList (glb) {
-  let glbs = Array.isArray(glb) ? glb : [glb];
-
-  return Promise.all(glbs.map(glb => new Promise((resolve, reject) => {
-    glob(glb, (err, _files) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      const files = _files.map(file => {
-        return !path.isAbsolute(file) ? path.join(process.cwd(), file) : file;
-      });
-      resolve(files);
-    });
-  }))).then(files => files.reduce((arr1, arr2) => arr1.concat(arr2)));
-};
-
 export function fileSrc (glb) {
   return gulp.src(glb);
 }
-
-export function equalLists (list1, list2) {
-  return list1.then(l => {
-    return expect(list2).to.have.eventually.members(l);
-  }).catch(err => {
-    throw new Error(err);
-  });
-};
 
 export const tmpOptions = func => cleanupWrapper(func, {
   before () {

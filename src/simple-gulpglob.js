@@ -1,5 +1,4 @@
 import gulp from 'gulp';
-import newer from 'gulp-newer';
 import isValidGlob from 'is-valid-glob';
 import path from 'path';
 import PolyPath, {Path} from 'polypath';
@@ -106,24 +105,6 @@ class SimpleGulpGlob {
       base: this.base,
       cwd: this.cwd,
     }, options));
-  }
-
-  newer (dest, options) {
-    return this.src(options).pipe(newer(dest));
-  }
-
-  list (options) {
-    return this.isReady().then(() => new Promise((resolve, reject) => {
-      const list = [];
-      this.src(Object.assign({read: false}, options))
-        .on('data', file => {
-          list.push(file.path);
-        })
-        .on('end', () => {
-          console.log(list.join('\n'));
-          resolve(list);
-        });
-    }));
   }
 
   dest (dest, {ready} = {}) {

@@ -47,11 +47,9 @@
     "gulp-replace": "^0.6.1",
     "keyfunc": "^0.10.0",
     "merge-stream": "^1.0.1",
-    "muter": "^0.6.0",
     "plumb-gulp": "^0.1.0"
   },
   "dependencies": {
-    "gulp-newer": "^1.3.0",
     "is-valid-glob": "^1.0.0",
     "polypath": "^0.6.0"
   },

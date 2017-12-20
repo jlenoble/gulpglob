@@ -1,10 +1,8 @@
 import path from 'path';
-import Muter, {muted} from 'muter';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import GulpGlob from '../src/gulpglob';
-import {invalidArgs, validArgs, fileList, fileSrc, equalLists,
-  newTestDir} from './helpers';
+import {invalidArgs, validArgs, fileSrc, newTestDir} from './helpers';
 import {tmpDir} from 'cleanup-wrapper';
 import equalStreamContents from 'equal-stream-contents';
 import {toArrayOfArrays} from 'argu';
@@ -13,8 +11,6 @@ import equalFileContents from 'equal-file-contents';
 chai.use(chaiAsPromised);
 
 describe('GulpGlob is a class encapsulting gulp.src', function () {
-  const muter = Muter(console, 'log'); // eslint-disable-line new-cap
-
   it(`A GulpGlob instance can't be initialized from an invalid glob argument`,
     function () {
       invalidArgs().forEach(arg => {
@@ -56,25 +52,6 @@ describe('GulpGlob is a class encapsulting gulp.src', function () {
       return equalStreamContents(src, refSrc);
     })));
   });
-
-  it('A GulpGlob instance can list files', muted(muter, function () {
-    return Promise.all(validArgs().map(glb => {
-      const glob = new GulpGlob([glb]);
-      const list = glob.list();
-      const refList = fileList(glb);
-
-      return Promise.all([
-        equalLists(list, refList),
-        list.then(() => {
-          const logs = muter.getLogs().split('\n')
-            .filter(el => el !== '').sort();
-          muter.forget();
-          return expect(refList.then(l => l.sort()))
-            .to.eventually.eql(logs);
-        }),
-      ]);
-    }));
-  }));
 
   it('A GulpGlob instance can copy files', function () {
     this.timeout(5000); // eslint-disable-line no-invalid-this

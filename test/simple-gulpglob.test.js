@@ -1,18 +1,14 @@
 import path from 'path';
-import Muter, {muted} from 'muter';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {SimpleGulpGlob} from '../src/gulpglob';
-import {invalidArgs, validArgs, fileList, equalLists,
-  newTestDir} from './helpers';
+import {invalidArgs, validArgs, newTestDir} from './helpers';
 import {tmpDir} from 'cleanup-wrapper';
 import equalFileContents from 'equal-file-contents';
 
 chai.use(chaiAsPromised);
 
 describe('SimpleGulpGlob is a class encapsulting gulp.src', function () {
-  const muter = Muter(console, 'log'); // eslint-disable-line new-cap
-
   it(`A SimpleGulpGlob instance can't be initialized from an invalid glob` +
     `argument`, function () {
     invalidArgs().forEach(arg => {
@@ -33,25 +29,6 @@ describe('SimpleGulpGlob is a class encapsulting gulp.src', function () {
       }).to.throw(TypeError, /Cannot assign to read only property 'glob'/);
     });
   });
-
-  it('A SimpleGulpGlob instance can list files', muted(muter, function () {
-    return Promise.all(validArgs().map(glb => {
-      const glob = new SimpleGulpGlob(glb);
-      const list = glob.list();
-      const refList = fileList(glb);
-
-      return Promise.all([
-        equalLists(list, refList),
-        list.then(() => {
-          const logs = muter.getLogs().split('\n')
-            .filter(el => el !== '').sort();
-          muter.forget();
-          return expect(refList.then(l => l.sort()))
-            .to.eventually.eql(logs);
-        }),
-      ]);
-    }));
-  }));
 
   it('A SimpleGulpGlob instance can copy files', function () {
     this.timeout(5000); // eslint-disable-line no-invalid-this
