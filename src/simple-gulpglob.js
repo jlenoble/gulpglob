@@ -78,10 +78,6 @@ class SimpleGulpGlob {
     return this[_ready];
   }
 
-  toPromise () {
-    return this.isReady().then(() => this);
-  }
-
   relative (base) {
     return this[_polypath].relative(base);
   }
