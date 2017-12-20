@@ -2,7 +2,6 @@ import isValidGlob from 'is-valid-glob';
 import path from 'path';
 import SimpleGulpGlob from './simple-gulpglob';
 import {SingletonFactory} from 'singletons';
-import {toArrayOfArrays} from 'argu';
 
 const GulpGlob = SingletonFactory(SimpleGulpGlob, [
   'array:literal',
@@ -23,12 +22,17 @@ const GulpGlob = SingletonFactory(SimpleGulpGlob, [
         return [glb.glob, glb.options];
       },
     }],
+    [String, {
+      convert (glb) {
+        return [[glb], SimpleGulpGlob.getDefaults()];
+      },
+    }],
   ],
 
   preprocess: function (args) {
     // First have all args in the form [glb, options], converting
     // SimpleGulpGlobs and GulpGlobs
-    const args2 = toArrayOfArrays(args).map(([glb, options]) => {
+    const args2 = args.map(([glb, options]) => {
       if (!isValidGlob(glb)) {
         throw new TypeError(`Invalid glob element: "${
           JSON.stringify(glb)

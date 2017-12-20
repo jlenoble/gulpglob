@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/jlenoble/gulpglob#readme",
   "devDependencies": {
+    "argu": "^0.1.3",
     "autoreload-gulp": "^0.3.0",
     "babel-core": "^6.26.0",
     "babel-plugin-add-module-exports": "^0.2.1",
@@ -50,7 +51,6 @@
     "plumb-gulp": "^0.1.0"
   },
   "dependencies": {
-    "argu": "^0.1.3",
     "gulp-newer": "^1.3.0",
     "is-valid-glob": "^1.0.0",
     "polypath": "^0.6.0"
