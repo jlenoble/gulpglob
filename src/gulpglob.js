@@ -100,10 +100,9 @@ const GulpGlob = SingletonFactory(SimpleGulpGlob, [
       {base, cwd, ready: () => Promise.all(args4.map(sgg => sgg.isReady()))}];
   },
 
-  postprocess (instance, args) {
+  postprocess (args) {
     const [, options] = args;
-    instance._resetReady(options);
-    return instance;
+    this._resetReady(options);
   },
 });
 
