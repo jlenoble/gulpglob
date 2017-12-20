@@ -35,7 +35,7 @@
     "cleanup-wrapper": "^0.3.0",
     "del": "^3.0.0",
     "equal-file-contents": "^0.1.6",
-    "equal-stream-contents": "^0.1.4",
+    "equal-stream-contents": "^0.1.5",
     "eslint": "^4.13.1",
     "eslint-config-google": "^0.9.1",
     "glob": "^7.1.2",
