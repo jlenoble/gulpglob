@@ -1,5 +1,4 @@
 import isValidGlob from 'is-valid-glob';
-import path from 'path';
 import SimpleGulpGlob from './simple-gulpglob';
 import {SingletonFactory} from 'singletons';
 
@@ -17,40 +16,34 @@ const GulpGlob = SingletonFactory(SimpleGulpGlob, [
   }, optional: true},
 ], {
   customArgs: [
-    [SimpleGulpGlob, {
-      convert (glb) {
-        return [glb.glob, glb.options];
-      },
-    }],
     [String, {
       convert (glb) {
         return [[glb], SimpleGulpGlob.getDefaults()];
       },
     }],
+    [Array, {
+      convert ([glb, options]) {
+        return [
+          Array.isArray(glb) ? glb : [glb],
+          options || SimpleGulpGlob.getDefaults(),
+        ];
+      },
+    }],
+    [SimpleGulpGlob, {
+      convert (glb) {
+        return [glb.glob, glb.options];
+      },
+    }],
   ],
 
   preprocess: function (args) {
-    // First have all args in the form [glb, options], converting
-    // SimpleGulpGlobs and GulpGlobs
-    const args2 = args.map(([glb, options]) => {
+    // First do a sanity check on all args
+    args.forEach(([glb, options]) => {
       if (!isValidGlob(glb)) {
         throw new TypeError(`Invalid glob element: "${
           JSON.stringify(glb)
         }"`);
       }
-
-      let cwd = options && options.cwd || SimpleGulpGlob.getDefaults().cwd;
-      if (!path.isAbsolute(cwd)) {
-        cwd = path.join(process.cwd(), cwd);
-      }
-
-      let base = options && options.base || cwd;
-      if (!path.isAbsolute(base)) {
-        base = path.join(process.cwd(), base);
-      }
-
-      return [Array.isArray(glb) ? glb : [glb], Object.assign({}, options,
-        {cwd, base})];
     });
 
     // Now split globs into excluded or not
@@ -58,7 +51,7 @@ const GulpGlob = SingletonFactory(SimpleGulpGlob, [
     let i;
     let exclude;
 
-    args2.forEach(([glb, options]) => {
+    args.forEach(([glb, options]) => {
       glb.forEach((g, nth) => {
         if (exclude === undefined) {
           exclude = g[0] === '!';
