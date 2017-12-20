@@ -3,15 +3,10 @@ import isValidGlob from 'is-valid-glob';
 import path from 'path';
 import PolyPath, {Path} from 'polypath';
 
-let defaultOptions = {
-  cwd: process.cwd(),
-  base: process.cwd(),
-};
-
 export const getOptions = (options = {}) => {
   let {cwd, base, ready, exclude} = options;
 
-  cwd = cwd && new Path(cwd).path || defaultOptions.cwd;
+  cwd = cwd && new Path(cwd).path || process.cwd();
   base = base && new Path(base).path || cwd;
   exclude = !!exclude;
 
@@ -147,14 +142,5 @@ class SimpleGulpGlob {
     }
   }
 }
-
-SimpleGulpGlob.getDefaults = () => {
-  return Object.assign({}, defaultOptions);
-};
-
-SimpleGulpGlob.setDefaults = ({cwd, base}) => {
-  cwd && (defaultOptions.cwd = new Path(cwd).path);
-  base && (defaultOptions.base = new Path(base).path);
-};
 
 export default SimpleGulpGlob;

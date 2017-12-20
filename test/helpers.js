@@ -1,7 +1,5 @@
 import path from 'path';
 import gulp from 'gulp';
-import cleanupWrapper from 'cleanup-wrapper';
-import SimpleGulpGlob from '../src/simple-gulpglob';
 import {equiv} from 'keyfunc';
 import os from 'os';
 
@@ -31,15 +29,6 @@ export function invalidArgs () {
 export function fileSrc (glb) {
   return gulp.src(glb);
 }
-
-export const tmpOptions = func => cleanupWrapper(func, {
-  before () {
-    this.defaultOptions = SimpleGulpGlob.getDefaults();
-  },
-  after () {
-    SimpleGulpGlob.setDefaults(this.defaultOptions);
-  },
-});
 
 export const eq = equiv({
   type: 'option',

@@ -107,9 +107,6 @@ const GulpGlob = SingletonFactory(SimpleGulpGlob, [
   },
 });
 
-GulpGlob.getDefaults = SimpleGulpGlob.getDefaults;
-GulpGlob.setDefaults = SimpleGulpGlob.setDefaults;
-
 SimpleGulpGlob.Singleton = GulpGlob;
 
 export default GulpGlob;
