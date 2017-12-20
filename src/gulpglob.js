@@ -17,15 +17,19 @@ const GulpGlob = SingletonFactory(SimpleGulpGlob, [
     },
   }, optional: true},
 ], {
+  customArgs: [
+    [SimpleGulpGlob, {
+      convert (glb) {
+        return [glb.glob, glb.options];
+      },
+    }],
+  ],
+
   preprocess: function (args) {
     // First have all args in the form [glb, options], converting
     // SimpleGulpGlobs and GulpGlobs
     const args2 = toArrayOfArrays(args).map(([glb, options]) => {
       if (!isValidGlob(glb)) {
-        if (glb instanceof SimpleGulpGlob) {
-          return [glb.glob, glb.options];
-        }
-
         throw new TypeError(`Invalid glob element: "${
           JSON.stringify(glb)
         }"`);
