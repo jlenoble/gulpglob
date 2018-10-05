@@ -45,6 +45,8 @@
     "gulp-eslint": "^5.0.0",
     "gulp-mocha": "^6.0.0",
     "gulp-replace": "^1.0.0",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-util": "^3.0.8",
     "keyfunc": "^0.10.0",
     "merge-stream": "^1.0.1",
     "plumb-gulp": "^0.2.0"
