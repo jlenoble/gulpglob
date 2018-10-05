@@ -1,6 +1,7 @@
 import isValidGlob from 'is-valid-glob';
 import SimpleGulpGlob, {getOptions} from './simple-gulpglob';
 import {SingletonFactory} from 'singletons';
+import PolyPath from 'polypath';
 
 const GulpGlob = SingletonFactory(SimpleGulpGlob, [
   'array:literal',
@@ -52,6 +53,9 @@ const GulpGlob = SingletonFactory(SimpleGulpGlob, [
     let exclude;
 
     args.forEach(([glb, options]) => {
+      const poly = new PolyPath(...glb);
+      console.log(glb, poly.paths)
+
       glb.forEach((g, nth) => {
         if (exclude === undefined) {
           exclude = g[0] === '!';
@@ -64,8 +68,8 @@ const GulpGlob = SingletonFactory(SimpleGulpGlob, [
 
         // Create an intermediate SimpleGulpGlob to handle easily cwd,
         // base and readiness
-        args3[i].push(new SimpleGulpGlob(exclude ? g.substring(1) : g,
-          Object.assign({exclude}, options, {
+        args3[i].push(new SimpleGulpGlob(g,
+          Object.assign({}, options, {
             // Don't run more than once the same ready function on
             // sibling globs
             ready: nth === 0 ? options.ready : () => Promise.resolve(),

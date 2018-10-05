@@ -4,17 +4,16 @@ import path from 'path';
 import PolyPath, {Path} from 'polypath';
 
 export const getOptions = (options = {}) => {
-  let {cwd, base, ready, exclude} = options;
+  let {cwd, base, ready} = options;
 
   cwd = cwd && new Path(cwd).path || process.cwd();
   base = base && new Path(base).path || cwd;
-  exclude = !!exclude;
 
   if (typeof ready !== 'function') {
     ready = () => Promise.resolve();
   }
 
-  return {cwd, base, ready, exclude};
+  return {cwd, base, ready};
 };
 
 const _ready = Symbol();
@@ -28,7 +27,7 @@ class SimpleGulpGlob {
       }"`);
     }
 
-    const {base, cwd, ready, exclude} = getOptions(options);
+    const {base, cwd, ready} = getOptions(options);
 
     this[_ready] = ready();
 
@@ -49,10 +48,6 @@ class SimpleGulpGlob {
         value: base,
       },
 
-      exclude: {
-        value: exclude,
-      },
-
       paths: {
         value: polypath.paths,
       },
@@ -66,7 +61,6 @@ class SimpleGulpGlob {
           return {
             cwd: this.cwd,
             base: this.base,
-            exclude: this.exclude,
             ready: () => this[_ready],
           };
         },
